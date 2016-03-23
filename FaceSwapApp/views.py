@@ -4,7 +4,7 @@ from FaceSwapApp.models import SwappedImage
 from django.http import HttpResponse
 
 def swap(request):
-	imagesjson = request.REQUEST.get("imagesjson", "[]")
+	imagesjson = request.GET.get("imagesjson", "[]")
 	images = json.loads(imagesjson)
 
 	swapMap = {}

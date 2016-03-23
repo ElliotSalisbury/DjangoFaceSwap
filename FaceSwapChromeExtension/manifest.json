@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+
+  "name": "Face Swap",
+  "description": "This extension FaceSwaps images on page",
+  "version": "1.0",
+
+  "content_scripts": [
+    {
+      "matches": ["http://*/*","https://*/*"],
+      "js": ["jquery-1.11.1.min.js","swapimages.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "permissions": [
+    "activeTab"
+  ]
+}
