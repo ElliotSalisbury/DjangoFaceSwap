@@ -1,9 +1,15 @@
 {
   "manifest_version": 2,
 
-  "name": "Face Swap",
-  "description": "This extension FaceSwaps images on page",
+  "name": "Trump Face Swap",
   "version": "1.0",
+
+  "default_locale": "en",
+  "description": "This extension FaceSwaps images on page",
+  "author": "Elliot Salisbury",
+  "homepage_url": "crowdrobotics.org",
+
+  "icons": {"128":"icon128.png"},
 
   "content_scripts": [
     {

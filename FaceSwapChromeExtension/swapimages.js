@@ -26,7 +26,7 @@ var observer = new MutationObserver(function(mutations) {
 			//send the image data off to be processed
 			$.ajax({
 				type: "POST",
-				url: "https://127.0.0.1:8000/swap",
+				url: "https://crowddrone.ecs.soton.ac.uk/swap",
 				cache: false,
 				data: {
 					imageb64: dataURL
