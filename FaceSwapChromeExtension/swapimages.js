@@ -1,6 +1,8 @@
 //taskId to img map
 var taskMap = {};
 
+var HOST = "https://crowddrone.ecs.soton.ac.uk:9000";
+
 function hashb64Img(imgb64) {
 	//this is terrible right now
 	return imgb64.substring(45, 65);
@@ -86,7 +88,7 @@ function startSwapTask(elementToSwap) {
 		//send the image data off to be processed
 		$.ajax({
 			type: "POST",
-			url: "https://crowddrone.ecs.soton.ac.uk/startSwap",
+			url: HOST+"/startSwap",
 			cache: false,
 			data: {
 				imageb64: imageb64
@@ -115,7 +117,7 @@ function pollSwapTask(taskId) {
 	setTimeout(function () {
 		$.ajax({
 			type: "GET",
-			url: "https://crowddrone.ecs.soton.ac.uk/getSwap",
+			url: HOST+"/getSwap",
 			cache: false,
 			data: {
 				taskId: taskId
