@@ -1,22 +1,39 @@
 //taskId to img map
 var taskMap = {};
 
-// create an observer instance
-var observer = new MutationObserver(function(mutations) {
+function hashb64Img(imgb64) {
+	//this is terrible right now
+	return imgb64.substring(45, 65);
+}
+
+// mutation observer for if an image changes
+var imgObserver = new MutationObserver(function(mutations) {
+	mutations.forEach(function(mutation) {
+		if (mutation.attributeName == "src") {
+			//we store the swapped data twice, to make sure that if the src is changing, its not because of me
+			if(hashb64Img(mutation.target.src) != mutation.target.hashedSrc) {
+				startSwapTask(mutation.target);
+			}
+
+		}
+	});
+});
+
+// mutation observer for the whole DOM
+var domObserver = new MutationObserver(function(mutations) {
     $("img:not('.SWAPPEDALREADY')").each(function(){
 		//add the swapped class so we don't process this image again
 		$(this).addClass("SWAPPEDALREADY");
 
+		//register a MutationObserver incase the src externally changes
+		var config = { characterData: true, attributes: true };
+		imgObserver.observe(this, config);
+
 		startSwapTask(this);
 	});
 });
-
-// configuration of the observer:
 var config = { childList: true, characterData: true, subtree: true };
-// select the target node
-var target = document.querySelector('body');
-// pass in the target node, as well as the observer options
-observer.observe(target, config);
+domObserver.observe(document.querySelector('body'), config);
 
 function startSwapTask(elementToSwap) {
 	//create a new image to avoid cross site issues
@@ -85,6 +102,7 @@ function pollSwapTask(taskId) {
 
 				}
 				else if (data.status == "SUCCESS") {
+					taskMap[taskId].hashedSrc = hashb64Img(data.image);
 					taskMap[taskId].src = data.image;
 				} else {
 					//all other status messages mean we should try again later
