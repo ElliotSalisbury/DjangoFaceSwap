@@ -55,12 +55,3 @@ var config = { childList: true, characterData: true, subtree: true };
 var target = document.querySelector('body');
 // pass in the target node, as well as the observer options
 observer.observe(target, config);
-
-$("img").each(function(){
-	var img = new Image();
-	img.setAttribute('crossOrigin', 'anonymous');
-	img.src = this.src;
-
-
-
-});
