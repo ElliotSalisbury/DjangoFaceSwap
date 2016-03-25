@@ -1,37 +1,58 @@
-function img_find() {
-    var imgs = document.getElementsByTagName("img");
-	var imgSrcs = [];
-    for (var i = 0; i < imgs.length; i++) {
-		var img = imgs[i];
-		if (img.naturalWidth > 100 && img.naturalHeight > 100) {
-			imgSrcs.push(img.src);
-		}
-    }
-    return imgSrcs;
-}
-var imgSrcs = img_find();
-console.log(imgSrcs);
-var imagesjson = JSON.stringify(imgSrcs);
+// create an observer instance
+var observer = new MutationObserver(function(mutations) {
+    $("img:not('.SWAPPEDALREADY')").each(function(){
+		//add the swapped class so we don't process this image again
+		$(this).addClass("SWAPPEDALREADY");
 
-$.ajax({
-	type: "GET",
-	url: "http://127.0.0.1:8000/swap",
-	cache: false,
-	data: {
-		imagesjson: imagesjson
-	},
-	success: function (data) {
-		var imgs = document.getElementsByTagName("img");
-		var imgSrcs = [];
-		for (var i = 0; i < imgs.length; i++) {
-			var img = imgs[i];
-			if (img.src in data) {
-				img.src = data[img.src];
-			}
-		}
-		console.log(data)
-	},
-	error: function(data) {
-		console.log("Could not swap images");
-	}
+		//avoid cross site scripting issues
+		var img = new Image();
+		img.setAttribute('crossOrigin', 'anonymous');
+		img.src = this.src;
+
+		var that = this;
+		img.onload = function() {
+			//draw the image to a canvas so we can get the imageData
+			var canvas = document.createElement('CANVAS');
+			var ctx = canvas.getContext('2d');
+			var dataURL;
+			canvas.height = this.height;
+			canvas.width = this.width;
+			ctx.drawImage(this, 0, 0);
+			dataURL = canvas.toDataURL("image/jpg");
+
+			//send the image data off to be processed
+			$.ajax({
+				type: "POST",
+				url: "http://127.0.0.1:8000/swap",
+				cache: false,
+				data: {
+					imageb64: dataURL
+				},
+				success: function (data) {
+					that.src = data.image;
+				},
+				error: function(data) {
+					console.log("Could not swap images");
+				}
+			});
+
+			canvas = null;
+		};
+	});
+});
+
+// configuration of the observer:
+var config = { childList: true, characterData: true, subtree: true };
+// select the target node
+var target = document.querySelector('body');
+// pass in the target node, as well as the observer options
+observer.observe(target, config);
+
+$("img").each(function(){
+	var img = new Image();
+	img.setAttribute('crossOrigin', 'anonymous');
+	img.src = this.src;
+
+
+
 });
