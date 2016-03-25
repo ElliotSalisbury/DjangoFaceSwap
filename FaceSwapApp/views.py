@@ -1,35 +1,33 @@
-import json
-from django.core.exceptions import ObjectDoesNotExist
-from FaceSwapApp.models import SwappedImage
-from django.http import HttpResponse, HttpResponseServerError
-from align import faceSwapImages
-import base64
-import numpy as np
-import cv2
+from django.http import HttpResponse, HttpResponseServerError, JsonResponse
+from tasks import faceSwapTask
 
-def base64_to_image(imageb64):
-	raw = base64.decodestring(imageb64.replace("data:image/png;",""))
-	image = np.frombuffer(raw, dtype=np.uint8)
-	image = cv2.imdecode(image, cv2.CV_LOAD_IMAGE_COLOR)
-	return image
-
-def image_to_base64(image):
-	jpgdata = cv2.imencode('.jpg',image)[1]
-	b64 = "data:image/jpg;base64,"+base64.encodestring(jpgdata)
-	return b64
-
-def swap(request):
+def startSwap(request):
 	imageb64 = request.POST.get("imageb64", None)
 	if imageb64 is None:
 		return HttpResponseServerError()
 
-	try:
-		image = base64_to_image(imageb64.split(',')[1])
-		swapped = faceSwapImages(image)
-		replyb64 = image_to_base64(swapped)
+	result = faceSwapTask.delay(imageb64)
 
-		reply = json.dumps({"success":True, "image":replyb64})
-	except Exception as e:
-		reply = json.dumps({"success":False, "msg":e.message})
+	return HttpResponse(result.id, content_type="text/plain")
 
-	return HttpResponse(reply, content_type="application/json")
+def getSwap(request):
+	taskId = request.GET.get("taskId", None)
+
+	reply = {}
+
+	if taskId:
+		#get the results from celery
+		result = faceSwapTask.AsyncResult(taskId)
+		reply["status"] = result.status
+
+		#if the task has finished
+		if reply["status"] == "SUCCESS":
+			#get the image
+			reply["image"] = result.get()
+			#if no image has been returned (probably no faces)
+			if reply["image"] is None:
+				#return the task as failed, so that JS stops polling
+				reply["status"] = "FAILURE"
+		return JsonResponse(reply)
+
+	return HttpResponseServerError("No TaskId")
