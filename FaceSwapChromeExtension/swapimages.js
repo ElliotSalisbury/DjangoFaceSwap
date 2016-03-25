@@ -9,13 +9,11 @@ function hashb64Img(imgb64) {
 // mutation observer for if an image changes
 var imgObserver = new MutationObserver(function(mutations) {
 	mutations.forEach(function(mutation) {
-		if (mutation.attributeName == "src") {
-			//we store the swapped data twice, to make sure that if the src is changing, its not because of me
-			if(hashb64Img(mutation.target.src) != mutation.target.hashedSrc) {
-				startSwapTask(mutation.target);
-			}
-
+		//we store the swapped data twice, to make sure that if the src is changing, its not because of me
+		if(hashb64Img(getSrcFromElement(mutation.target)) != mutation.target.hashedSrc) {
+			startSwapTask(mutation.target);
 		}
+
 	});
 });
 
@@ -26,7 +24,16 @@ var domObserver = new MutationObserver(function(mutations) {
 		$(this).addClass("SWAPPEDALREADY");
 
 		//register a MutationObserver incase the src externally changes
-		var config = { characterData: true, attributes: true };
+		var config = { characterData: true, attributes: true, attributeFilter: ["src"] };
+		imgObserver.observe(this, config);
+
+		startSwapTask(this);
+	});
+
+	$("*:not('.SWAPPEDALREADY')").filter(function(){ return this.style && this.style.backgroundImage}).each(function(){
+		$(this).addClass("SWAPPEDALREADY");
+
+		var config = { characterData: true, attributes: true, attributeFilter: ["style"] };
 		imgObserver.observe(this, config);
 
 		startSwapTask(this);
@@ -35,11 +42,29 @@ var domObserver = new MutationObserver(function(mutations) {
 var config = { childList: true, characterData: true, subtree: true };
 domObserver.observe(document.querySelector('body'), config);
 
+function getSrcFromElement(element) {
+	if (element instanceof HTMLImageElement) {
+		return element.src;
+	}else if (element.style && element.style.backgroundImage) {
+		var src = element.style.backgroundImage.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+		return src;
+	}
+	return "";
+}
+function setSrcOnElement(element, src) {
+	if (element instanceof HTMLImageElement) {
+		element.src = src;
+	}else if (element.style && element.style.backgroundImage) {
+		$(element).css("background-image", "url("+src.replace(/\n/g,"")+")");
+	}
+	element.hashedSrc = hashb64Img(src);
+}
+
 function startSwapTask(elementToSwap) {
 	//create a new image to avoid cross site issues
 	var img = new Image();
 	img.setAttribute('crossOrigin', 'anonymous');
-	img.src = elementToSwap.src;
+	img.src = getSrcFromElement(elementToSwap);
 
 	img.onload = function() {
 		//check the image is worth sending
@@ -102,8 +127,7 @@ function pollSwapTask(taskId) {
 
 				}
 				else if (data.status == "SUCCESS") {
-					taskMap[taskId].hashedSrc = hashb64Img(data.image);
-					taskMap[taskId].src = data.image;
+					setSrcOnElement(taskMap[taskId], data.image);
 				} else {
 					//all other status messages mean we should try again later
 					pollSwapTask(taskId);
