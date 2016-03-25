@@ -23,20 +23,13 @@ def swap(request):
 	if imageb64 is None:
 		return HttpResponseServerError()
 
-	image = base64_to_image(imageb64.split(',')[1])
-	swapped = faceSwapImages(image)
-	replyb64 = image_to_base64(swapped)
+	try:
+		image = base64_to_image(imageb64.split(',')[1])
+		swapped = faceSwapImages(image)
+		replyb64 = image_to_base64(swapped)
 
-	# swapMap = {}
-	# for image in images:
-	# 	try:
-	# 		swapped = SwappedImage.objects.get(pk=image)
-	# 		swapMap[image] = swapped.swappedLink
-	# 	except ObjectDoesNotExist:
-	# 		swapMap[image] = "https://lh4.ggpht.com/wKrDLLmmxjfRG2-E-k5L5BUuHWpCOe4lWRF7oVs1Gzdn5e5yvr8fj-ORTlBF43U47yI=w300"
-	# 		donaldImg = "static/FaceSwapApp/Donald/donald1.jpg"
-	# 		cv2.im
-	# 		faceSwapImages()
+		reply = json.dumps({"success":True, "image":replyb64})
+	except Exception as e:
+		reply = json.dumps({"success":False, "msg":e.message})
 
-	reply = json.dumps({"image":replyb64})
 	return HttpResponse(reply, content_type="application/json")

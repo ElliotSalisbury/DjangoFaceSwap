@@ -11,25 +11,33 @@ var observer = new MutationObserver(function(mutations) {
 
 		var that = this;
 		img.onload = function() {
+			if (this.naturalHeight < 100 || this.naturalWidth < 100) {
+				return;
+			}
 			//draw the image to a canvas so we can get the imageData
 			var canvas = document.createElement('CANVAS');
 			var ctx = canvas.getContext('2d');
 			var dataURL;
-			canvas.height = this.height;
-			canvas.width = this.width;
-			ctx.drawImage(this, 0, 0);
+			canvas.height = that.clientHeight;
+			canvas.width = that.clientWidth;
+			ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
 			dataURL = canvas.toDataURL("image/jpg");
 
 			//send the image data off to be processed
 			$.ajax({
 				type: "POST",
-				url: "http://127.0.0.1:8000/swap",
+				url: "https://127.0.0.1:8000/swap",
 				cache: false,
 				data: {
 					imageb64: dataURL
 				},
 				success: function (data) {
-					that.src = data.image;
+					if (data.success) {
+						that.src = data.image;
+					}else {
+						console.log(data.msg);
+					}
+
 				},
 				error: function(data) {
 					console.log("Could not swap images");

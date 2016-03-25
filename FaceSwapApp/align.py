@@ -227,7 +227,10 @@ def faceSwapImages(im1):
 
 FACESWAPS = []
 for impath in glob.glob(os.path.join(FACESWAP_FOLDER_PATH,"*.jpg")):
-    im = cv2.imread(impath)
-    landmarks = get_landmarks(im)[0]
+    try:
+        im = cv2.imread(impath)
+        landmarks = get_landmarks(im)[0]
 
-    FACESWAPS.append((im,landmarks))
+        FACESWAPS.append((im,landmarks))
+    except Exception as e:
+        pass
