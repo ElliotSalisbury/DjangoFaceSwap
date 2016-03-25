@@ -51,7 +51,6 @@ import random
 import os
 from FaceSwapApp.settings import *
 
-PREDICTOR_PATH = FACESWAP_SHAPEPREDICTOR_PATH
 SCALE_FACTOR = 1
 FEATHER_AMOUNT = 11
 
@@ -81,7 +80,7 @@ OVERLAY_POINTS = [
 COLOUR_CORRECT_BLUR_FRAC = 0.6
 
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor(PREDICTOR_PATH)
+predictor = dlib.shape_predictor(FACESWAP_SHAPEPREDICTOR_PATH)
 
 class TooManyFaces(Exception):
     pass
@@ -227,7 +226,7 @@ def faceSwapImages(im1):
     return im1
 
 FACESWAPS = []
-for impath in glob.glob(os.path.join(FACESWAP_FOLDER_PATH,"*.{jpg,jpeg,png}")):
+for impath in glob.glob(os.path.join(FACESWAP_FOLDER_PATH,"*.jpg")):
     im = cv2.imread(impath)
     landmarks = get_landmarks(im)[0]
 
