@@ -44,7 +44,7 @@ function startSwapTask(elementToSwap) {
 		//send the image data off to be processed
 		$.ajax({
 			type: "POST",
-			url: "http://127.0.0.1:8001/startSwap",
+			url: "https://crowddrone.ecs.soton.ac.uk/swap",
 			cache: false,
 			data: {
 				imageb64: imageb64
