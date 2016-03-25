@@ -44,7 +44,7 @@ function startSwapTask(elementToSwap) {
 		//send the image data off to be processed
 		$.ajax({
 			type: "POST",
-			url: "https://crowddrone.ecs.soton.ac.uk/swap",
+			url: "https://crowddrone.ecs.soton.ac.uk/startSwap",
 			cache: false,
 			data: {
 				imageb64: imageb64
@@ -73,7 +73,7 @@ function pollSwapTask(taskId) {
 	setTimeout(function () {
 		$.ajax({
 			type: "GET",
-			url: "http://127.0.0.1:8001/getSwap",
+			url: "https://crowddrone.ecs.soton.ac.uk/getSwap",
 			cache: false,
 			data: {
 				taskId: taskId
