@@ -10,14 +10,14 @@ from .align import faceSwapImages
 
 
 def base64_to_image(imageb64):
-    raw = base64.decodestring(imageb64.split(',')[1].replace("data:image/png;",""))
+    raw = base64.decodestring(imageb64.split(',')[1])
     image = np.frombuffer(raw, dtype=np.uint8)
     image = cv2.imdecode(image, cv2.CV_LOAD_IMAGE_COLOR)
     return image
 
 def image_to_base64(image):
-    jpgdata = cv2.imencode('.jpg',image)[1]
-    b64 = "data:image/jpg;base64,"+base64.encodestring(jpgdata)
+    jpgdata = cv2.imencode('.webp',image)[1]
+    b64 = "data:image/webp;base64,"+base64.encodestring(jpgdata)
     return b64
 
 @shared_task

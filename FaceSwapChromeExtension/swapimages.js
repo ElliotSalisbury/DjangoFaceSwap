@@ -83,7 +83,7 @@ function startSwapTask(elementToSwap) {
 		canvas.height = Math.min(elementToSwap.clientHeight, this.naturalHeight);
 		ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
 		//get the image as base64
-		var imageb64 = canvas.toDataURL("image/jpg");
+		var imageb64 = canvas.toDataURL("image/webp");
 
 		//send the image data off to be processed
 		$.ajax({
