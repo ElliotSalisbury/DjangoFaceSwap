@@ -2,6 +2,7 @@
 var taskMap = {};
 
 var HOST = "https://crowddrone.ecs.soton.ac.uk:9000";
+var MAXSIZE = 512;
 
 function hashb64Img(imgb64) {
 	//this is terrible right now
@@ -78,9 +79,25 @@ function startSwapTask(elementToSwap) {
 		var canvas = document.createElement('CANVAS');
 		var ctx = canvas.getContext('2d');
 
-		//only render as much as we need to
-		canvas.width = Math.min(elementToSwap.clientWidth, this.naturalWidth);
-		canvas.height = Math.min(elementToSwap.clientHeight, this.naturalHeight);
+		//only render as much as we need to, check if client or natural is smaller
+		if (elementToSwap.clientWidth * elementToSwap.clientHeight < this.naturalWidth * this.naturalHeight) {
+			canvas.width = elementToSwap.clientWidth;
+			canvas.height = elementToSwap.clientHeight;
+		} else {
+			canvas.width = this.naturalWidth;
+			canvas.height = this.naturalHeight;
+		}
+		//ensure image is less than max size
+		if (canvas.width > MAXSIZE) {
+			var ratio = MAXSIZE / canvas.width;
+			canvas.width = MAXSIZE;
+			canvas.height = canvas.height * ratio;
+		}else if (canvas.height > MAXSIZE) {
+			var ratio = MAXSIZE / canvas.height;
+			canvas.height = MAXSIZE;
+			canvas.width = canvas.width * ratio;
+		}
+		//draw our image
 		ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
 		//get the image as base64
 		var imageb64 = canvas.toDataURL("image/webp");
