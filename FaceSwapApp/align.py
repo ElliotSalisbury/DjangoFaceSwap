@@ -205,22 +205,37 @@ def correct_colours(im1, im2, landmarks1):
     return (im2.astype(numpy.float64) * im1_blur.astype(numpy.float64) /
                                                 im2_blur.astype(numpy.float64))
 
+def getFaceDirection(landmarks):
+    facePos = numpy.mean(landmarks[FACE_POINTS],0)
+    nosePos = numpy.mean(landmarks[NOSE_POINTS],0)
+
+    if nosePos[0,0] < facePos[0,0]:
+        return -1
+    else:
+        return 1
+
 def faceSwapImages(im1):
-    landmarks = get_landmarks(im1)
+    im1_all_landmarks = get_landmarks(im1)
 
-    for facemarks in landmarks:
-        im2,landmarksDonald = random.choice(FACESWAPS)
+    for im1_face_landmarks in im1_all_landmarks:
+        im2_direction, im2,im2_landmarks,im2_flipped,im2_landmarks_flipped = random.choice(FACESWAPS)
 
-        M = transformation_from_points(facemarks[ALIGN_POINTS],
-                                       landmarksDonald[ALIGN_POINTS])
+        #swap the face if theyre pointing the wrong direction
+        im1_direction = getFaceDirection(im1_face_landmarks)
+        if im2_direction != im1_direction:
+            im2 = im2_flipped
+            im2_landmarks = im2_landmarks_flipped
 
-        mask = get_face_mask(im2, landmarksDonald)
+        M = transformation_from_points(im1_face_landmarks[ALIGN_POINTS],
+                                       im2_landmarks[ALIGN_POINTS])
+
+        mask = get_face_mask(im2, im2_landmarks)
         warped_mask = warp_im(mask, M, im1.shape)
-        combined_mask = numpy.max([get_face_mask(im1, facemarks), warped_mask],
+        combined_mask = numpy.max([get_face_mask(im1, im1_face_landmarks), warped_mask],
                                   axis=0)
 
         warped_im2 = warp_im(im2, M, im1.shape)
-        warped_corrected_im2 = correct_colours(im1, warped_im2, facemarks)
+        warped_corrected_im2 = correct_colours(im1, warped_im2, im1_face_landmarks)
 
         im1 = im1 * (1.0 - combined_mask) + warped_corrected_im2 * combined_mask
     return im1
@@ -230,7 +245,10 @@ for impath in glob.glob(os.path.join(FACESWAP_FOLDER_PATH,"*.jpg")):
     try:
         im = cv2.imread(impath)
         landmarks = get_landmarks(im)[0]
+        face_direction = getFaceDirection(landmarks)
+        im_flipped = cv2.flip(im,1)
+        landmarks_flipped = get_landmarks(im_flipped)[0]
 
-        FACESWAPS.append((im,landmarks))
+        FACESWAPS.append((face_direction,im,landmarks,im_flipped,landmarks_flipped))
     except Exception as e:
         pass
