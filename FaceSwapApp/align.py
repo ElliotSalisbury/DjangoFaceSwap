@@ -53,6 +53,7 @@ from FaceSwapApp.settings import *
 
 SCALE_FACTOR = 1
 FEATHER_AMOUNT = 11
+MAX_SIZE = 512
 
 FACE_POINTS = list(range(17, 68))
 MOUTH_POINTS = list(range(48, 61))
@@ -215,6 +216,7 @@ def getFaceDirection(landmarks):
         return 1
 
 def faceSwapImages(im1):
+    im1 = ensureImageLessThanMax(im1)
     im1_all_landmarks = get_landmarks(im1)
 
     for im1_face_landmarks in im1_all_landmarks:
@@ -240,10 +242,27 @@ def faceSwapImages(im1):
         im1 = im1 * (1.0 - combined_mask) + warped_corrected_im2 * combined_mask
     return im1
 
+def ensureImageLessThanMax(im):
+    height, width, depth = im.shape
+    if height > MAX_SIZE or width > MAX_SIZE:
+
+        if width > height:
+            ratio = MAX_SIZE / float(width)
+            width = MAX_SIZE
+            height = int(height * ratio)
+        else:
+            ratio = MAX_SIZE / float(height)
+            height = MAX_SIZE
+            width = width * ratio
+        im = cv2.resize(im,(width,height))
+    return im
+
 FACESWAPS = []
 for impath in glob.glob(os.path.join(FACESWAP_FOLDER_PATH,"*.jpg")):
     try:
         im = cv2.imread(impath)
+        im = ensureImageLessThanMax(im)
+
         landmarks = get_landmarks(im)[0]
         face_direction = getFaceDirection(landmarks)
         im_flipped = cv2.flip(im,1)
