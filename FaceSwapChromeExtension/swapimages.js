@@ -3,6 +3,7 @@ var taskMap = {};
 
 var HOST = "https://crowddrone.ecs.soton.ac.uk:9090";
 var MAXSIZE = 512;
+var MINSIZE = 100;
 
 function hashb64Img(imgb64) {
 	//this is terrible right now
@@ -102,7 +103,7 @@ function startSwapTask(elementToSwap) {
 		var sh = this.naturalHeight;
 
 		//check the image is worth sending
-		if (canvas.width < 100 || canvas.height < 100) {
+		if (canvas.width < MINSIZE || canvas.height < MINSIZE || elementToSwap.clientWidth < MINSIZE || elementToSwap.clientHeight < MINSIZE) {
 			return;
 		}
 		//draw our image
