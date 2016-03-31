@@ -1,7 +1,7 @@
 //taskId to img map
 var taskMap = {};
 
-var HOST = "https://crowddrone.ecs.soton.ac.uk:9000";
+var HOST = "https://crowddrone.ecs.soton.ac.uk:9090";
 var MAXSIZE = 512;
 
 function hashb64Img(imgb64) {

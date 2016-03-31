@@ -2,9 +2,9 @@
   "manifest_version": 2,
 
   "name": "Trump Face Swap",
-  "version": "1.0.5",
+  "version": "1.0.6",
 
-  "description": "This extension face swaps everyone with donalds trumps face",
+  "description": "This extension face swaps everyone on the page with Donald Trump's face",
   "author": "Elliot Salisbury",
 
   "icons": {"128":"icon128.png"},
