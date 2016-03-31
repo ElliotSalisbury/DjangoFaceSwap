@@ -253,7 +253,7 @@ def ensureImageLessThanMax(im):
         else:
             ratio = MAX_SIZE / float(height)
             height = MAX_SIZE
-            width = width * ratio
+            width = int(width * ratio)
         im = cv2.resize(im,(width,height))
     return im
 
