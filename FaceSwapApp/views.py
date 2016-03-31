@@ -6,7 +6,8 @@ def startSwap(request):
 	if imageb64 is None:
 		return HttpResponseServerError()
 
-	result = faceSwapTask.delay(imageb64)
+	#send an image to be processed, but ignore the task if its taking longer than 3 minutes
+	result = faceSwapTask.apply_async((imageb64,), expires=60*3)
 
 	return HttpResponse(result.id, content_type="text/plain")
 
