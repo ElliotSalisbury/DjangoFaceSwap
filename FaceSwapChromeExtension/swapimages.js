@@ -70,23 +70,19 @@ function startSwapTask(elementToSwap) {
 	img.src = getSrcFromElement(elementToSwap);
 
 	img.onload = function() {
-		//check the image is worth sending
-		if (this.naturalHeight < 100 || this.naturalWidth < 100) {
-			return;
-		}
-
-		//draw the image to a canvas so we can get the imageData
+		//we need to draw the image to a canvas so we can get the imageData
 		var canvas = document.createElement('CANVAS');
 		var ctx = canvas.getContext('2d');
 
 		//only render as much as we need to, check if client or natural is smaller
-		if (elementToSwap.clientWidth * elementToSwap.clientHeight < this.naturalWidth * this.naturalHeight) {
+		if (elementToSwap instanceof HTMLImageElement && elementToSwap.clientWidth * elementToSwap.clientHeight < this.naturalWidth * this.naturalHeight) {
 			canvas.width = elementToSwap.clientWidth;
 			canvas.height = elementToSwap.clientHeight;
 		} else {
 			canvas.width = this.naturalWidth;
 			canvas.height = this.naturalHeight;
 		}
+
 		//ensure image is less than max size
 		if (canvas.width > MAXSIZE) {
 			var ratio = MAXSIZE / canvas.width;
@@ -97,8 +93,20 @@ function startSwapTask(elementToSwap) {
 			canvas.height = MAXSIZE;
 			canvas.width = canvas.width * ratio;
 		}
+
+		//what part of the source image should we use
+		//TODO calculate rendered image from css background-image and background-position property
+		var sx = 0;
+		var sy = 0;
+		var sw = this.naturalWidth;
+		var sh = this.naturalHeight;
+
+		//check the image is worth sending
+		if (canvas.width < 100 || canvas.height < 100) {
+			return;
+		}
 		//draw our image
-		ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+		ctx.drawImage(this, sx,sy,sw,sh, 0, 0, canvas.width, canvas.height);
 		//get the image as base64
 		var imageb64 = canvas.toDataURL("image/webp");
 
