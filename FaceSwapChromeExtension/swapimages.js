@@ -5,16 +5,22 @@ var HOST = "https://crowddrone.ecs.soton.ac.uk:9090";
 var MAXSIZE = 512;
 var MINSIZE = 100;
 
-function hashb64Img(imgb64) {
-	//this is terrible right now
-	return imgb64.substring(45, 65);
-}
+String.prototype.hashCode = function() {
+  var hash = 0, i, chr, len;
+  if (this.length === 0) return hash;
+  for (i = 0, len = this.length; i < len; i++) {
+    chr   = this.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
 
 // mutation observer for if an image changes
 var imgObserver = new MutationObserver(function(mutations) {
 	mutations.forEach(function(mutation) {
 		//we store the swapped data twice, to make sure that if the src is changing, its not because of me
-		if(hashb64Img(getSrcFromElement(mutation.target)) != mutation.target.hashedSrc) {
+		if(getSrcFromElement(mutation.target).hashCode() != mutation.target.hashedSrc) {
 			startSwapTask(mutation.target);
 		}
 
@@ -46,6 +52,16 @@ var domObserver = new MutationObserver(function(mutations) {
 var config = { childList: true, characterData: true, subtree: true };
 domObserver.observe(document.querySelector('body'), config);
 
+//var maxImage;
+//$("img:not('.SWAPPEDALREADY')").each(function(){
+//	if (maxImage == undefined || maxImage.clientWidth*maxImage.clientHeight < this.clientWidth * this.clientHeight) {
+//		maxImage = this;
+//	}
+//});
+//var config = { characterData: true, attributes: true, attributeFilter: ["src"] };
+//imgObserver.observe(maxImage, config);
+//startSwapTask(maxImage);
+
 function getSrcFromElement(element) {
 	if (element instanceof HTMLImageElement) {
 		return element.src;
@@ -56,12 +72,18 @@ function getSrcFromElement(element) {
 	return "";
 }
 function setSrcOnElement(element, src) {
+	src = src.replace(/\n/g,"");
 	if (element instanceof HTMLImageElement) {
+		//ensure image doesnt resize when we set the new src
+		var currentWidth = element.clientWidth;
+		var currentHeight = element.clientHeight;
 		element.src = src;
+		element.width = currentWidth;
+		element.height = currentHeight;
 	}else if (element.style && element.style.backgroundImage) {
-		$(element).css("background-image", "url("+src.replace(/\n/g,"")+")");
+		$(element).css("background-image", "url("+src+")");
 	}
-	element.hashedSrc = hashb64Img(src);
+	element.hashedSrc = src.hashCode();
 }
 
 function startSwapTask(elementToSwap) {
