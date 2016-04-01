@@ -180,8 +180,12 @@ def read_im_and_landmarks(fname):
 
     return im, s
 
-def warp_im(im, M, dshape):
-    output_im = numpy.zeros(dshape, dtype=im.dtype)
+def warp_im(im, M, dshape, warpOnTo=None):
+    if warpOnTo is None:
+        output_im = numpy.zeros(dshape, dtype=im.dtype)
+    else:
+        output_im = warpOnTo.copy()
+
     cv2.warpAffine(im,
                    M[:2],
                    (dshape[1], dshape[0]),
@@ -235,7 +239,8 @@ def faceSwapImages(im1):
         combined_mask = numpy.max([get_face_mask(im1, im1_face_landmarks), warped_mask],
                                   axis=0)
 
-        warped_im2 = warp_im(im2, M, im1.shape)
+        #warp onto im1 to try and reduce any color correction issues around the edge of im2
+        warped_im2 = warp_im(im2, M, im1.shape, im1)
 
         #anywhere in the warped im2 that is black should not be color corrected
         ret,thresh1 = cv2.threshold(warped_im2,0,1,cv2.THRESH_BINARY)
