@@ -236,6 +236,10 @@ def faceSwapImages(im1):
         combined_mask = numpy.max([get_face_mask(im1, im1_face_landmarks), warped_mask],
                                   axis=0)
 
+        #anywhere in the warped im2 that is black should not be color corrected
+        ret,thresh1 = cv2.threshold(warped_im2,0,1,cv2.THRESH_BINARY)
+        combined_mask = combined_mask*thresh1
+
         warped_im2 = warp_im(im2, M, im1.shape)
         warped_corrected_im2 = correct_colours(im1, warped_im2, im1_face_landmarks)
 
