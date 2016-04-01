@@ -1,5 +1,6 @@
-from django.http import HttpResponse, HttpResponseServerError, JsonResponse
+from django.http import HttpResponse, HttpResponseServerError
 from tasks import faceSwapTask
+import json
 
 def startSwap(request):
 	imageb64 = request.POST.get("imageb64", None)
@@ -29,6 +30,6 @@ def getSwap(request):
 			if reply["image"] is None:
 				#return the task as failed, so that JS stops polling
 				reply["status"] = "FAILURE"
-		return JsonResponse(reply)
+		return HttpResponse(json.dumps(reply), content_type="application/json")
 
 	return HttpResponseServerError("No TaskId")
