@@ -186,8 +186,7 @@ def warp_im(im, M, dshape):
                    M[:2],
                    (dshape[1], dshape[0]),
                    dst=output_im,
-                   borderMode=cv2.BORDER_TRANSPARENT,
-                   flags=cv2.WARP_INVERSE_MAP)
+                   borderMode=cv2.BORDER_TRANSPARENT)
     return output_im
 
 def correct_colours(im1, im2, landmarks1):
@@ -228,8 +227,8 @@ def faceSwapImages(im1):
             im2 = im2_flipped
             im2_landmarks = im2_landmarks_flipped
 
-        M = transformation_from_points(im1_face_landmarks[ALIGN_POINTS],
-                                       im2_landmarks[ALIGN_POINTS])
+        M = transformation_from_points(im2_landmarks[ALIGN_POINTS],
+                                       im1_face_landmarks[ALIGN_POINTS])
 
         mask = get_face_mask(im2, im2_landmarks)
         warped_mask = warp_im(mask, M, im1.shape)
