@@ -6,7 +6,7 @@ import cv2
 import base64
 import numpy as np
 
-from .align import faceSwapImages
+from .align import faceSwapImages, NoFaces
 
 
 def base64_to_image(imageb64):
@@ -22,8 +22,11 @@ def image_to_base64(image):
 
 @shared_task
 def faceSwapTask(imageb64):
-    image = base64_to_image(imageb64)
-    swapped = faceSwapImages(image)
-    replyb64 = image_to_base64(swapped)
+    try:
+        image = base64_to_image(imageb64)
+        swapped = faceSwapImages(image)
+        replyb64 = image_to_base64(swapped)
 
-    return replyb64
+        return replyb64
+    except NoFaces as noFacesError:
+        return None
