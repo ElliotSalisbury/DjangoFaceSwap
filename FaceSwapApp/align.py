@@ -243,8 +243,8 @@ def faceSwapImages(im1):
         warped_im2 = warp_im(im2, M, im1.shape, im1)
 
         #anywhere in the warped im2 that is black should not be color corrected
-        ret,thresh1 = cv2.threshold(warped_im2,0,1,cv2.THRESH_BINARY)
-        combined_mask = combined_mask*thresh1
+        # ret,thresh1 = cv2.threshold(warped_im2,0,1,cv2.THRESH_BINARY)
+        # combined_mask = combined_mask*thresh1
 
         warped_corrected_im2 = correct_colours(im1, warped_im2, im1_face_landmarks)
 
@@ -270,7 +270,7 @@ FACESWAPS = []
 for impath in glob.glob(os.path.join(FACESWAP_FOLDER_PATH,"*.jpg")):
     try:
         im = cv2.imread(impath)
-        im = ensureImageLessThanMax(im)
+        #im = ensureImageLessThanMax(im)
 
         landmarks = get_landmarks(im)[0]
         face_direction = getFaceDirection(landmarks)

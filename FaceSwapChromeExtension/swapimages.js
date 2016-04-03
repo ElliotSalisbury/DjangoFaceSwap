@@ -52,15 +52,18 @@ var domObserver = new MutationObserver(function(mutations) {
 var config = { childList: true, characterData: true, subtree: true };
 domObserver.observe(document.querySelector('body'), config);
 
-//var maxImage;
-//$("img:not('.SWAPPEDALREADY')").each(function(){
-//	if (maxImage == undefined || maxImage.clientWidth*maxImage.clientHeight < this.clientWidth * this.clientHeight) {
-//		maxImage = this;
-//	}
+//Good for debugging, hover over image and press a key
+//$("img").hover(function() {
+//	var thatImg = this;
+//	$(document).keydown(function() {
+//		//var config = { characterData: true, attributes: true, attributeFilter: ["src"] };
+//		//imgObserver.observe(maxImage, config);
+//		startSwapTask(thatImg);
+//	});
+//    }, function() {
+//	   $(document).unbind("keydown");
 //});
-//var config = { characterData: true, attributes: true, attributeFilter: ["src"] };
-//imgObserver.observe(maxImage, config);
-//startSwapTask(maxImage);
+
 
 function getSrcFromElement(element) {
 	if (element instanceof HTMLImageElement) {
