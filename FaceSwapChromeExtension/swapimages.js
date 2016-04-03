@@ -95,7 +95,16 @@ function setSrcOnElement(element, src) {
 	element.hashedSrc = src.hashCode();
 }
 
+function isBlacklisted(elementToSwap) {
+	return $(elementToSwap).hasClass("spotlight"); //cant handle facebook spotlight for some reason (goes black when src modified)
+}
+
 function startSwapTask(elementToSwap) {
+	//first check if we can swap this element
+	if (isBlacklisted(elementToSwap)) {
+		return;
+	}
+
 	//create a new image to avoid cross site issues
 	var img = new Image();
 	img.setAttribute('crossOrigin', 'anonymous');
