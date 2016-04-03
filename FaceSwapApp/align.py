@@ -158,6 +158,7 @@ def warp_im(im, M, dshape, warpOnTo=None):
                         M,
                         (dshape[1], dshape[0]),
                         dst=output_im)
+    return output_im
 
 def correct_colours(im1, im2, landmarks1):
     blur_amount = COLOUR_CORRECT_BLUR_FRAC * numpy.linalg.norm(
@@ -202,8 +203,7 @@ def faceSwapImages(im1):
 
         mask = get_face_mask(im2, im2_landmarks)
         warped_mask = warp_im(mask, M, im1.shape)
-        combined_mask = numpy.max([get_face_mask(im1, im1_face_landmarks), warped_mask],
-                                  axis=0)
+        combined_mask = cv2.max(get_face_mask(im1, im1_face_landmarks), warped_mask)
 
         #warp onto im1 to try and reduce any color correction issues around the edge of im2
         warped_im2 = warp_im(im2, M, im1.shape, im1)
