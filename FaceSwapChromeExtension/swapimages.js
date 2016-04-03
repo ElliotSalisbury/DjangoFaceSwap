@@ -1,5 +1,8 @@
 //taskId to img map
 var taskMap = {};
+var imgQueue = new PriorityQueue({ comparator: function(imgA, imgB) {
+	return imgB.size-imgA.size;
+}});
 
 var HOST = "https://crowddrone.ecs.soton.ac.uk:9090";
 var MAXSIZE = 512;
@@ -51,6 +54,9 @@ var domObserver = new MutationObserver(function(mutations) {
 });
 var config = { childList: true, characterData: true, subtree: true };
 domObserver.observe(document.querySelector('body'), config);
+
+//start the queue consumer
+var queueConsumer = setInterval(consumeSwapTask,100);
 
 //Good for debugging, hover over image and press a key
 //$("img").hover(function() {
@@ -131,37 +137,46 @@ function startSwapTask(elementToSwap) {
 		if (canvas.width < MINSIZE || canvas.height < MINSIZE || elementToSwap.clientWidth < MINSIZE || elementToSwap.clientHeight < MINSIZE) {
 			return;
 		}
+
 		//draw our image
 		ctx.drawImage(this, sx,sy,sw,sh, 0, 0, canvas.width, canvas.height);
 		//get the image as base64
 		var imageb64 = canvas.toDataURL("image/webp");
 
+		//add the image to the queue to be sent off for processing later
+		imgQueue.queue({"size":sw*sh,"b64":imageb64,"element":elementToSwap});
+
+		//remove the canvas once done with it
+		canvas = null;
+	};
+}
+
+function consumeSwapTask() {
+	if (imgQueue.length > 0) {
+		var imgObj = imgQueue.dequeue();
 		//send the image data off to be processed
 		$.ajax({
 			type: "POST",
-			url: HOST+"/startSwap",
+			url: HOST + "/startSwap",
 			cache: false,
 			data: {
-				imageb64: imageb64
+				imageb64: imgObj.b64
 			},
 			success: function (data) {
 				//get the processing ID from the server
 				var taskId = data;
 
 				//associate the id with the original DOM element
-				taskMap[taskId] = elementToSwap;
+				taskMap[taskId] = imgObj.element;
 
 				//start polling to see if the processing is complete
 				pollSwapTask(taskId);
 			},
 			error: function (data) {
-				console.log("error starting");
+				console.log("error contacting the faceswap server");
 			}
 		});
-
-		//remove the canvas once done with it
-		canvas = null;
-	};
+	}
 }
 
 function pollSwapTask(taskId) {
@@ -175,8 +190,8 @@ function pollSwapTask(taskId) {
 			},
 			success: function (data) {
 				if (data.status == "FAILURE") {
-					//this image cannot be swapped, log the reason
-					console.log(data.status);
+					//this image cannot be swapped, probably no faces
+					//console.log(data.status);
 
 				}
 				else if (data.status == "SUCCESS") {
@@ -187,7 +202,7 @@ function pollSwapTask(taskId) {
 				}
 			},
 			error: function (data) {
-				console.log("error polling");
+				console.log("error polling the faceswap server");
 			}
 		});
 	}, 100);

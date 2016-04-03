@@ -12,7 +12,7 @@
   "content_scripts": [
     {
       "matches": ["http://*/*","https://*/*"],
-      "js": ["jquery-1.11.1.min.js","swapimages.js"],
+      "js": ["jquery-1.11.1.min.js","priority-queue.js","swapimages.js"],
       "run_at": "document_end"
     }
   ],
