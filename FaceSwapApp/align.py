@@ -119,19 +119,17 @@ def draw_convex_hull(im, points, color):
     cv2.fillConvexPoly(im, points, color=color)
 
 def get_face_mask(im, landmarks):
-    im = numpy.zeros(im.shape[:2], dtype=numpy.float64)
+    height, width = im.shape[:2]
+    mask = numpy.zeros((height, width, 3), dtype=numpy.float64)
 
     for group in OVERLAY_POINTS:
-        draw_convex_hull(im,
+        draw_convex_hull(mask,
                          landmarks[group],
-                         color=1)
+                         color=(1,1,1))
 
-    im = numpy.array([im, im, im]).transpose((1, 2, 0))
+    mask = cv2.GaussianBlur(mask, (FEATHER_AMOUNT, FEATHER_AMOUNT), 0)
 
-    im = (cv2.GaussianBlur(im, (FEATHER_AMOUNT, FEATHER_AMOUNT), 0) > 0) * 1.0
-    im = cv2.GaussianBlur(im, (FEATHER_AMOUNT, FEATHER_AMOUNT), 0)
-
-    return im
+    return mask
 
 def transformation_from_points(points1, points2):
     points1 = points1.astype(numpy.float64)
@@ -148,18 +146,6 @@ def read_im_and_landmarks(fname):
 
     return im, s
 
-def warp_im(im, M, dshape, warpOnTo=None):
-    if warpOnTo is None:
-        output_im = numpy.zeros(dshape, dtype=im.dtype)
-    else:
-        output_im = warpOnTo.copy().astype(im.dtype)
-
-    cv2.warpPerspective(im,
-                        M,
-                        (dshape[1], dshape[0]),
-                        dst=output_im)
-    return output_im
-
 def correct_colours(im1, im2, landmarks1):
     blur_amount = COLOUR_CORRECT_BLUR_FRAC * numpy.linalg.norm(
                               numpy.mean(landmarks1[LEFT_EYE_POINTS], axis=0) -
@@ -171,10 +157,9 @@ def correct_colours(im1, im2, landmarks1):
     im2_blur = cv2.GaussianBlur(im2, (blur_amount, blur_amount), 0)
 
     # Avoid divide-by-zero errors.
-    im2_blur += (128 * (im2_blur <= 1.0)).astype(im2_blur.dtype)
+    im2_blur[im2_blur <= 0.0] = 0.001
 
-    return (im2.astype(numpy.float64) * im1_blur.astype(numpy.float64) /
-                                                im2_blur.astype(numpy.float64))
+    return (im2 * im1_blur) / im2_blur
 
 def getFaceDirection(landmarks):
     facePos = numpy.mean(landmarks[FACE_POINTS],0)
@@ -188,6 +173,7 @@ def getFaceDirection(landmarks):
 def faceSwapImages(im1):
     im1 = ensureImageLessThanMax(im1)
     im1_all_landmarks = get_landmarks(im1)
+    im1 = im1.astype(numpy.float64)
 
     for im1_face_landmarks in im1_all_landmarks:
         im2_direction, im2,im2_landmarks,im2_flipped,im2_landmarks_flipped = random.choice(FACESWAPS)
@@ -202,19 +188,22 @@ def faceSwapImages(im1):
                                        im1_face_landmarks[ALIGN_POINTS])
 
         mask = get_face_mask(im2, im2_landmarks)
-        warped_mask = warp_im(mask, M, im1.shape)
+        warped_mask = cv2.warpPerspective(mask,
+                                          M,
+                                          (im1.shape[1], im1.shape[0]))
         combined_mask = cv2.max(get_face_mask(im1, im1_face_landmarks), warped_mask)
 
         #warp onto im1 to try and reduce any color correction issues around the edge of im2
-        warped_im2 = warp_im(im2, M, im1.shape, im1)
-
-        #anywhere in the warped im2 that is black should not be color corrected
-        # ret,thresh1 = cv2.threshold(warped_im2,0,1,cv2.THRESH_BINARY)
-        # combined_mask = combined_mask*thresh1
+        warped_im2 = cv2.warpPerspective(im2,
+                                         M,
+                                         (im1.shape[1], im1.shape[0]),
+                                         dst=im1.copy(),
+                                         borderMode=cv2.BORDER_TRANSPARENT)
 
         warped_corrected_im2 = correct_colours(im1, warped_im2, im1_face_landmarks)
 
         im1 = im1 * (1.0 - combined_mask) + warped_corrected_im2 * combined_mask
+    im1 = numpy.clip(im1, 0, 255, out=im1).astype(numpy.uint8)
     return im1
 
 def ensureImageLessThanMax(im):
@@ -242,6 +231,10 @@ for impath in glob.glob(os.path.join(FACESWAP_FOLDER_PATH,"*.jpg")):
         face_direction = getFaceDirection(landmarks)
         im_flipped = cv2.flip(im,1)
         landmarks_flipped = get_landmarks(im_flipped)[0]
+
+        #convert to float64 first to avoid repeatedly doing it
+        im = im.astype(numpy.float64)
+        im_flipped = im_flipped.astype(numpy.float64)
 
         FACESWAPS.append((face_direction,im,landmarks,im_flipped,landmarks_flipped))
     except Exception as e:
