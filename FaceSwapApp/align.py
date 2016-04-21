@@ -71,9 +71,9 @@ ALIGN_POINTS = (JAW_POINTS + LEFT_BROW_POINTS + RIGHT_EYE_POINTS + LEFT_EYE_POIN
 # Points from the second image to overlay on the first. The convex hull of each
 # element will be overlaid.
 OVERLAY_POINTS = [
-    LEFT_EYE_POINTS + RIGHT_EYE_POINTS + LEFT_BROW_POINTS + RIGHT_BROW_POINTS,
-    NOSE_POINTS + MOUTH_POINTS,
-    # FACE_POINTS + JAW_POINTS,
+    # LEFT_EYE_POINTS + RIGHT_EYE_POINTS + LEFT_BROW_POINTS + RIGHT_BROW_POINTS,
+    # NOSE_POINTS + MOUTH_POINTS,
+    JAW_POINTS + LEFT_BROW_POINTS + RIGHT_BROW_POINTS,
 ]
 
 # Amount of blur to use during colour correction, as a fraction of the
