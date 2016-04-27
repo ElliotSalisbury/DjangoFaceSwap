@@ -9,8 +9,8 @@ var MAXSIZE = 512;
 var MINSIZE = 100;
 
 //lets load the user settings at the start, default values if settings havent been set
-var ONOFF = false;
-var PERCENTAGE = 0.9;
+var ONOFF = true;
+var PERCENTAGE = 1.0;
 chrome.storage.sync.get({
 		onoff: ONOFF,
 		percentage: PERCENTAGE
