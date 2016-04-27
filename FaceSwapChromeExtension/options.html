@@ -1,24 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Test Extension Options</title>
-  <style>
-    body{ padding: 10px; }
-  </style>
+    <title>Trump Face Swap Options</title>
+    <style>
+        body{
+            padding: 10px;
+            width: 300px;
+        }
+
+        #status {
+            float: right;
+        }
+    </style>
 </head>
 
 <body>
-	Trump Face Swapping On/Off:
-	<input type="checkbox" id="onoff">
-	<br>
+<h3>Trump Face Swapping On/Off</h3>
+<p><small>Uncheck to turn the face swapping off.</small></p>
+<input type="checkbox" id="onoff">
 
-	Trump percentage:
-	<input id="percentage" type="range" min="0" max="10">
-	<br>
+<hr>
 
-  <div id="status"></div>
-  <button id="save">Save</button>
+<h3>Trump Percentage</h3>
+<p><small>The percentage of images that get faceswapped.<br>A lower percentage means less photos get swapped for a more subtle effect.</small></p>
+<input id="percentage" type="range" min="0" max="10"><span id="percentageText"></span>
+<br>
 
-  <script src="options.js"></script>
+<hr>
+
+<div id="status"></div>
+<button id="save">Save</button>
+
+<script src="options.js"></script>
 </body>
 </html>

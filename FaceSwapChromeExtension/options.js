@@ -21,13 +21,21 @@ function restore_options() {
 	// Use default value color = 'red' and likesColor = true.
 	chrome.storage.sync.get({
 		onoff: true,
-		percentage: 0.9
+		percentage: 1.0
 
 	}, function(items) {
 		document.getElementById('onoff').checked = items.onoff;
 		document.getElementById('percentage').value = Math.floor(items.percentage * document.getElementById('percentage').max);
+		updateText();
 	});
 }
 document.addEventListener('DOMContentLoaded', restore_options);
 document.getElementById('save').addEventListener('click',
 	save_options);
+
+//when the percentage slider changes, update the text
+document.getElementById('percentage').oninput=updateText;
+function updateText() {
+	var percentage = Math.floor((document.getElementById('percentage').value / document.getElementById('percentage').max) * 100);
+	document.getElementById('percentageText').textContent=percentage.toString() + "%";
+}
