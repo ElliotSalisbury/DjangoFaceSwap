@@ -8,6 +8,20 @@ var HOST = "https://crowddrone.ecs.soton.ac.uk:9090";
 var MAXSIZE = 512;
 var MINSIZE = 100;
 
+//lets load the user settings at the start, default values if settings havent been set
+var ONOFF = false;
+var PERCENTAGE = 0.9;
+chrome.storage.sync.get({
+		onoff: ONOFF,
+		percentage: PERCENTAGE
+	}, function(items) {
+		ONOFF = items.onoff;
+		PERCENTAGE = items.percentage;
+
+		//start the faceswapping code
+		initialize();
+	});
+
 String.prototype.hashCode = function() {
   var hash = 0, i, chr, len;
   if (this.length === 0) return hash;
@@ -21,6 +35,11 @@ String.prototype.hashCode = function() {
 
 // mutation observer for if an image changes
 var imgObserver = new MutationObserver(function(mutations) {
+	//if it's turned off skip this observation
+	if (ONOFF == false) {
+		return;
+	}
+
 	mutations.forEach(function(mutation) {
 		//we store the swapped data twice, to make sure that if the src is changing, its not because of me
 		if(getSrcFromElement(mutation.target).hashCode() != mutation.target.hashedSrc) {
@@ -32,6 +51,11 @@ var imgObserver = new MutationObserver(function(mutations) {
 
 // mutation observer for the whole DOM
 var domObserver = new MutationObserver(function(mutations) {
+	//if it's turned off skip this observation
+	if (ONOFF == false) {
+		return;
+	}
+
     $("img:not('.SWAPPEDALREADY')").each(function(){
 		//add the swapped class so we don't process this image again
 		$(this).addClass("SWAPPEDALREADY");
@@ -52,8 +76,11 @@ var domObserver = new MutationObserver(function(mutations) {
 		startSwapTask(this);
 	});
 });
-var config = { childList: true, characterData: true, subtree: true };
-domObserver.observe(document.querySelector('body'), config);
+
+function initialize() {
+	var config = { childList: true, characterData: true, subtree: true };
+	domObserver.observe(document.querySelector('body'), config);
+}
 
 //start the queue consumer
 var queueConsumer = setInterval(consumeSwapTask,100);
@@ -102,6 +129,11 @@ function isBlacklisted(elementToSwap) {
 function startSwapTask(elementToSwap) {
 	//first check if we can swap this element
 	if (isBlacklisted(elementToSwap)) {
+		return;
+	}
+
+	//only swap PERCENTAGE of images
+	if (Math.random() > PERCENTAGE) {
 		return;
 	}
 

@@ -2,7 +2,12 @@
   "manifest_version": 2,
 
   "name": "Trump Face Swap",
-  "version": "1.0.8",
+  "version": "1.0.9",
+
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
 
   "description": "This extension face swaps everyone on the page with Donald Trump's face",
   "author": "Elliot Salisbury",
@@ -17,7 +22,12 @@
     }
   ],
 
+  "browser_action": {
+    "default_popup": "options.html"
+  },
+
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "storage"
   ]
 }
