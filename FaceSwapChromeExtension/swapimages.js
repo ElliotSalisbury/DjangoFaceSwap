@@ -137,10 +137,16 @@ function startSwapTask(elementToSwap) {
 		return;
 	}
 
+	//we dont deal with gifs so next get the src from the element
+	var src = getSrcFromElement(elementToSwap);
+	if (src.toLowerCase().endsWith(".gif")) {
+		return;
+	}
+
 	//create a new image to avoid cross site issues
 	var img = new Image();
 	img.setAttribute('crossOrigin', 'anonymous');
-	img.src = getSrcFromElement(elementToSwap);
+	img.src = src;
 
 	img.onload = function() {
 		//we need to draw the image to a canvas so we can get the imageData
