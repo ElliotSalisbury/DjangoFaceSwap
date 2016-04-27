@@ -80,6 +80,38 @@ var domObserver = new MutationObserver(function(mutations) {
 function initialize() {
 	var config = { childList: true, characterData: true, subtree: true };
 	domObserver.observe(document.querySelector('body'), config);
+	
+	// var currMousPos = {x:0,y:0};
+	// $( "body" ).mousemove(function(mevent){
+	// 	currMousPos.x = mevent.clientX;
+	// 	currMousPos.y = mevent.clientY;
+	// });
+
+	$( "body" ).on( "mouseenter mouseleave", "img, a:has(div):has(img)", function(event) {
+		//depending on the event type, choose the new src we're going to temporarily display
+		var newSrc = "originalSrc";
+		if (event.type == "mouseleave") {
+			newSrc = "faceSwappedSrc";
+		}
+
+		//depending on the selector, we may have an img or (because of facebook) an element that contains an img
+		if (this instanceof HTMLImageElement) {
+			if (typeof this[newSrc] != 'undefined') {
+				setSrcOnElement(this,this[newSrc]);
+			}
+		}else {
+			//get the child imgs
+			$(this).find("img").each(function() {
+				//check if mouse is inside img element
+				// var bounds = this.getBoundingClientRect();
+				// if (currMousPos.y > bounds.top && currMousPos.y < bounds.bottom && currMousPos.x > bounds.left && currMousPos.x < bounds.right) {
+					if (typeof this[newSrc] != 'undefined') {
+						setSrcOnElement(this,this[newSrc]);
+					}
+				// }
+			});
+		}
+	});
 }
 
 //start the queue consumer
@@ -242,6 +274,10 @@ function pollSwapTask(taskId) {
 
 				}
 				else if (data.status == "SUCCESS") {
+					var element = taskMap[taskId];
+					element.originalSrc = getSrcFromElement(element);
+					element.faceSwappedSrc = data.image;
+
 					setSrcOnElement(taskMap[taskId], data.image);
 				} else {
 					//all other status messages mean we should try again later
