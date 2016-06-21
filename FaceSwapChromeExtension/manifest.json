@@ -1,15 +1,15 @@
 {
   "manifest_version": 2,
 
-  "name": "Trump Face Swap",
-  "version": "1.0.10",
+  "name": "Blind Simulator",
+  "version": "0.0.1",
 
   "options_ui": {
     "page": "options.html",
     "chrome_style": true
   },
 
-  "description": "This extension face swaps everyone on the page with Donald Trump's face",
+  "description": "This extension removes every image and replaces it with alt-text",
   "author": "Elliot Salisbury",
 
   "icons": {"128":"icon128.png"},

@@ -91,7 +91,7 @@ function initialize() {
 		//depending on the event type, choose the new src we're going to temporarily display
 		var newSrc = "originalSrc";
 		if (event.type == "mouseleave") {
-			newSrc = "faceSwappedSrc";
+			newSrc = "swappedSrc";
 		}
 
 		//depending on the selector, we may have an img or (because of facebook) an element that contains an img
@@ -171,63 +171,11 @@ function startSwapTask(elementToSwap) {
 
 	//we dont deal with gifs so next get the src from the element
 	var src = getSrcFromElement(elementToSwap);
-	if (src.toLowerCase().endsWith(".gif")) {
+	if (!src || src.toLowerCase().endsWith(".gif")) {
 		return;
 	}
 
-	//create a new image to avoid cross site issues
-	var img = new Image();
-	img.setAttribute('crossOrigin', 'anonymous');
-	img.src = src;
-
-	img.onload = function() {
-		//we need to draw the image to a canvas so we can get the imageData
-		var canvas = document.createElement('CANVAS');
-		var ctx = canvas.getContext('2d');
-
-		//only render as much as we need to, check if client or natural is smaller
-		if (elementToSwap instanceof HTMLImageElement && elementToSwap.clientWidth * elementToSwap.clientHeight < this.naturalWidth * this.naturalHeight) {
-			canvas.width = elementToSwap.clientWidth;
-			canvas.height = elementToSwap.clientHeight;
-		} else {
-			canvas.width = this.naturalWidth;
-			canvas.height = this.naturalHeight;
-		}
-
-		//ensure image is less than max size
-		if (canvas.width > MAXSIZE) {
-			var ratio = MAXSIZE / canvas.width;
-			canvas.width = MAXSIZE;
-			canvas.height = canvas.height * ratio;
-		}else if (canvas.height > MAXSIZE) {
-			var ratio = MAXSIZE / canvas.height;
-			canvas.height = MAXSIZE;
-			canvas.width = canvas.width * ratio;
-		}
-
-		//what part of the source image should we use
-		//TODO calculate rendered image from css background-image and background-position property
-		var sx = 0;
-		var sy = 0;
-		var sw = this.naturalWidth;
-		var sh = this.naturalHeight;
-
-		//check the image is worth sending
-		if (canvas.width < MINSIZE || canvas.height < MINSIZE || elementToSwap.clientWidth < MINSIZE || elementToSwap.clientHeight < MINSIZE) {
-			return;
-		}
-
-		//draw our image
-		ctx.drawImage(this, sx,sy,sw,sh, 0, 0, canvas.width, canvas.height);
-		//get the image as base64
-		var imageb64 = canvas.toDataURL("image/webp");
-
-		//add the image to the queue to be sent off for processing later
-		imgQueue.queue({"size":sw*sh,"b64":imageb64,"element":elementToSwap});
-
-		//remove the canvas once done with it
-		canvas = null;
-	};
+	imgQueue.queue({"src":src,"element":elementToSwap});
 }
 
 function consumeSwapTask() {
@@ -236,57 +184,118 @@ function consumeSwapTask() {
 		//send the image data off to be processed
 		$.ajax({
 			type: "POST",
-			url: HOST + "/startSwap",
+			url: "https://www.captionbot.ai/api/message",
 			cache: false,
 			data: {
-				imageb64: imgObj.b64
-			},
+				"conversationId":"CAItAUhgbmj",
+				"waterMark":"",
+				"userMessage":imgObj.src},
 			success: function (data) {
-				//get the processing ID from the server
-				var taskId = data;
+				data = JSON.parse(data);
+				console.log(data);
 
-				//associate the id with the original DOM element
-				taskMap[taskId] = imgObj.element;
+				if(data.UserMessage) {
+					var element = imgObj.element;
 
-				//start polling to see if the processing is complete
-				pollSwapTask(taskId);
+					//create a canvas to render text
+					var canvas = document.createElement('CANVAS');
+					var ctx = canvas.getContext('2d');
+					canvas.width = element.clientWidth;
+					canvas.height = element.clientHeight;
+
+					//fill in black
+					ctx.beginPath();
+					ctx.rect(0, 0, canvas.width, canvas.height);
+					ctx.fillStyle = "black";
+					ctx.fill();
+					
+					//draw centered text
+					ctx.fillStyle = "white";
+					paint_centered_wrap(canvas,0,0,canvas.width,canvas.height,data.UserMessage,8,2);
+					var textSrc = canvas.toDataURL();
+					
+					element.originalSrc = imgObj.src;
+					element.swappedSrc = textSrc;
+
+					setSrcOnElement(element, textSrc);
+				}
 			},
 			error: function (data) {
-				console.log("error contacting the faceswap server");
+				console.log("error contacting the captionbot server");
 			}
 		});
 	}
 }
 
-function pollSwapTask(taskId) {
-	setTimeout(function () {
-		$.ajax({
-			type: "GET",
-			url: HOST+"/getSwap",
-			cache: false,
-			data: {
-				taskId: taskId
-			},
-			success: function (data) {
-				if (data.status == "FAILURE") {
-					//this image cannot be swapped, probably no faces
-					//console.log(data.status);
-
-				}
-				else if (data.status == "SUCCESS") {
-					var element = taskMap[taskId];
-					element.originalSrc = getSrcFromElement(element);
-					element.faceSwappedSrc = data.image;
-
-					setSrcOnElement(taskMap[taskId], data.image);
-				} else {
-					//all other status messages mean we should try again later
-					pollSwapTask(taskId);
-				}
-			},
-			error: function (data) {
-				console.log("error polling the faceswap server");
+/**
+ * @param canvas : The canvas object where to draw .
+ *                 This object is usually obtained by doing:
+ *                 canvas = document.getElementById('canvasId');
+ * @param x     :  The x position of the rectangle.
+ * @param y     :  The y position of the rectangle.
+ * @param w     :  The width of the rectangle.
+ * @param h     :  The height of the rectangle.
+ * @param text  :  The text we are going to centralize.
+ * @param fh    :  The font height (in pixels).
+ * @param spl   :  Vertical space between lines
+ */
+paint_centered_wrap = function(canvas, x, y, w, h, text, fh, spl) {
+	// The painting properties
+	// Normally I would write this as an input parameter
+	var Paint = {
+		VALUE_FONT : '12px Arial',
+	}
+	/*
+	 * @param ctx   : The 2d context
+	 * @param mw    : The max width of the text accepted
+	 * @param font  : The font used to draw the text
+	 * @param text  : The text to be splitted   into
+	 */
+	var split_lines = function(ctx, mw, font, text) {
+		// We give a little "padding"
+		// This should probably be an input param
+		// but for the sake of simplicity we will keep it
+		// this way
+		mw = mw - 10;
+		// We setup the text font to the context (if not already)
+		ctx2d.font = font;
+		// We split the text by words
+		var words = text.split(' ');
+		var new_line = words[0];
+		var lines = [];
+		for(var i = 1; i < words.length; ++i) {
+			if (ctx.measureText(new_line + " " + words[i]).width < mw) {
+				new_line += " " + words[i];
+			} else {
+				lines.push(new_line);
+				new_line = words[i];
 			}
-		});
-	}, 100);
+		}
+		lines.push(new_line);
+		// DEBUG
+		// for(var j = 0; j < lines.length; ++j) {
+		//    console.log("line[" + j + "]=" + lines[j]);
+		// }
+		return lines;
+	}
+	// Obtains the context 2d of the canvas
+	// It may return null
+	var ctx2d = canvas.getContext('2d');
+	if (ctx2d) {
+		// Paint text
+		var lines = split_lines(ctx2d, w, Paint.VALUE_FONT, text);
+		// Block of text height
+		var both = lines.length * (fh + spl);
+		// We determine the y of the first line
+		var ly = (h - both)/2 + y + spl*lines.length;
+		var lx = 0;
+		for (var j = 0, ly; j < lines.length; ++j, ly+=fh+spl) {
+			// We continue to centralize the lines
+			lx = x+w/2-ctx2d.measureText(lines[j]).width/2;
+			// DEBUG
+			ctx2d.fillText(lines[j], lx, ly);
+		}
+	} else {
+		// Do something meaningful
+	}
 }
