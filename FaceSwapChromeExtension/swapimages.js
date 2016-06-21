@@ -4,8 +4,6 @@ var imgQueue = new PriorityQueue({ comparator: function(imgA, imgB) {
 	return imgB.size-imgA.size;
 }});
 
-var HOST = "https://crowddrone.ecs.soton.ac.uk:9090";
-var MAXSIZE = 512;
 var MINSIZE = 100;
 
 //lets load the user settings at the start, default values if settings havent been set
@@ -166,6 +164,11 @@ function startSwapTask(elementToSwap) {
 
 	//only swap PERCENTAGE of images
 	if (Math.random() > PERCENTAGE) {
+		return;
+	}
+
+
+	if (elementToSwap.clientWidth < MINSIZE || elementToSwap.clientHeight < MINSIZE) {
 		return;
 	}
 
