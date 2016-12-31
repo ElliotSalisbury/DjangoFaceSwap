@@ -1,25 +1,35 @@
 from django.http import HttpResponse, HttpResponseServerError
-from tasks import faceSwapTask
+from tasks import faceSwapTask, faceBeautificationTask
 import json
 
-def startSwap(request):
+FACE_SWAP = 0
+FACE_BEAUTIFICATION = 1
+
+TASKS = {FACE_SWAP: faceSwapTask,
+		 FACE_BEAUTIFICATION: faceBeautificationTask}
+
+def startImageProcessing(request):
 	imageb64 = request.POST.get("imageb64", None)
+	type = request.POST.get("taskType", FACE_SWAP)
+
+	#we didnt get the uploaded image, return an error
 	if imageb64 is None:
-		return HttpResponseServerError()
+		return HttpResponseServerError("Image Upload Error")
 
 	#send an image to be processed, but ignore the task if its taking longer than 3 minutes
-	result = faceSwapTask.apply_async((imageb64,), expires=60*3)
+	result = TASKS[type].apply_async((imageb64,), expires=60*3)
 
 	return HttpResponse(result.id, content_type="text/plain")
 
 def getSwap(request):
 	taskId = request.GET.get("taskId", None)
+	type = request.POST.get("taskType", FACE_SWAP)
 
 	reply = {}
 
 	if taskId:
 		#get the results from celery
-		result = faceSwapTask.AsyncResult(taskId)
+		result = TASKS[type].AsyncResult(taskId)
 		reply["status"] = result.status
 
 		#if the task has finished

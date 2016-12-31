@@ -7,6 +7,7 @@ import base64
 import numpy as np
 
 from .align import faceSwapImages, NoFaces
+from .faceBeautifierWeb import beautifyIm_Web
 
 
 def base64_to_image(imageb64):
@@ -25,6 +26,16 @@ def faceSwapTask(imageb64):
     try:
         image = base64_to_image(imageb64)
         swapped = faceSwapImages(image)
+        replyb64 = image_to_base64(swapped)
+
+        return replyb64
+    except NoFaces as noFacesError:
+        return None
+
+def faceBeautificationTask(imageb64):
+    try:
+        image = base64_to_image(imageb64)
+        swapped = beautifyIm_Web(image)
         replyb64 = image_to_base64(swapped)
 
         return replyb64
