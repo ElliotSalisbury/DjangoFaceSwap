@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-from DockerEnvironment.web.FaceSwapApp import views
+from FaceSwapApp import views
 
 urlpatterns = patterns('',
                        url(r'^startSwap$', views.startImageProcessing, name='startSwap'),
