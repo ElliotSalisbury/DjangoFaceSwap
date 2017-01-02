@@ -14,6 +14,16 @@ web:
     DEBUG: 'true'
   command: /usr/local/bin/gunicorn django_server.wsgi:application -w 2 -b :8000
 
+celeryworker:
+  restart: always
+  build: ./web
+  links:
+    - redis:redis
+  volumes:
+    - /usr/src/app
+  env_file: .env
+  command: celery -A django_server worker --loglevel=INFO --concurrency=10 -n worker1.%h
+
 nginx:
   restart: always
   build: ./nginx/
@@ -29,15 +39,15 @@ nginx:
 postgres:
   restart: always
   image: postgres:latest
-  ports:
-    - "5432:5432"
+  expose:
+    - "5432"
   volumes:
     - pgdata:/var/lib/postgresql/data/
 
 redis:
   restart: always
   image: redis:latest
-  ports:
-    - "6379:6379"
+  expose:
+    - "6379"
   volumes:
     - redisdata:/data

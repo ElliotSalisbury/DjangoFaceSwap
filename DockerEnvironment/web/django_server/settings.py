@@ -28,13 +28,13 @@ DEBUG = os.getenv('DEBUG', 'NO').lower() in ('on', 'true', 'y', 'yes')
 ALLOWED_HOSTS = ['*']
 
 #Celery Stuff:
-BROKER_URL = 'redis://localhost:6379'
+BROKER_URL = 'redis://redis:6379'
 #CELERY_RESULT_BACKEND = 'rpc://'
 #CELERY_RESULT_PERSISTENT = False
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-CELERY_ACCEPT_CONTENT = ['pickle']
-CELERY_TASK_SERIALIZER = 'pickle'
-CELERY_RESULT_SERIALIZER = 'pickle'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 CELERY_DEFAULT_DELIVERY_MODE = 'transient'
 
 # Application definition
