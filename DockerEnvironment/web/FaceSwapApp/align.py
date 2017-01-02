@@ -6,7 +6,7 @@ import dlib
 import numpy
 
 FACESWAP_SHAPEPREDICTOR_PATH = "./data/shape_predictor_68_face_landmarks.dat"
-FACESWAP_FOLDER_PATH = "./data/faceswaps/"
+FACESWAP_FOLDER_PATH = "./data/faces/"
 
 SCALE_FACTOR = 1
 FEATHER_AMOUNT = 11
