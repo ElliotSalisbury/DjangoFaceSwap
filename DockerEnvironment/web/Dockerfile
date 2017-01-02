@@ -23,12 +23,10 @@ RUN cd /usr/local/bin \
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-ONBUILD COPY requirements.txt /usr/src/app/
-ONBUILD RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt /usr/src/app/
+RUN pip install --no-cache-dir -r requirements.txt
 
-ONBUILD COPY . /usr/src/app
-
-ADD ../../FaceSwapApp /usr/src/app/FaceSwapApp
+COPY . /usr/src/app
 
 # eos face fitting
 #RUN git clone --recursive https://github.com/patrikhuber/eos.git -b devel &&
