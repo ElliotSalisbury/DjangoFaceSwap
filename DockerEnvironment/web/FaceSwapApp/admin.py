@@ -1,5 +1,7 @@
 from django.contrib import admin
-from FaceSwapApp.models import SwappedImage
+
+from DockerEnvironment.web.FaceSwapApp.models import SwappedImage
+
 
 # Register your models here.
 class SwappedImageAdmin(admin.ModelAdmin):

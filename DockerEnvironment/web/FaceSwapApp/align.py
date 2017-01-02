@@ -43,13 +43,13 @@ from `<head image>` replaced with the facial features from `<face image>`.
 
 """
 
+import glob
+import os
+import random
+
 import cv2
 import dlib
 import numpy
-import glob
-import random
-import os
-from FaceSwapApp.settings import *
 
 SCALE_FACTOR = 1
 FEATHER_AMOUNT = 11

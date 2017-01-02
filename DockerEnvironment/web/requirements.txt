@@ -1,0 +1,14 @@
+Django==1.8.1
+gunicorn==19.3.0
+psycopg2==2.6
+redis==2.10.3
+
+dlib==19.1.0
+matplotlib==1.5.3
+numpy==1.11.2
+opencv-python==3.1.0
+pandas==0.19.1
+Pillow==3.4.2
+scikit-image==0.12.3
+scikit-learn==0.18.1
+scipy==0.18.1

@@ -1,9 +1,7 @@
 import numpy as np
-import pickle
-import os
-from beautifier import beautifyIm
+
 from US10K import loadUS10KFacialFeatures, loadUS10KPCAGP
-from FaceSwapApp.settings import *
+from beautifier import beautifyIm
 
 us10kdf = loadUS10KFacialFeatures()
 
