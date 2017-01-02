@@ -1,55 +1,12 @@
-#!/usr/bin/python
-
-# Copyright (c) 2015 Matthew Earl
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-#     The above copyright notice and this permission notice shall be included
-#     in all copies or substantial portions of the Software.
-#
-#     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-#     OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-#     MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-#     NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-#     DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-#     OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-#     USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-"""
-This is the code behind the Switching Eds blog post:
-
-    http://matthewearl.github.io/2015/07/28/switching-eds-with-python/
-
-See the above for an explanation of the code below.
-
-To run the script you'll need to install dlib (http://dlib.net) including its
-Python bindings, and OpenCV. You'll also need to obtain the trained model from
-sourceforge:
-
-    http://sourceforge.net/projects/dclib/files/dlib/v18.10/shape_predictor_68_face_landmarks.dat.bz2
-
-Unzip with `bunzip2` and change `PREDICTOR_PATH` to refer to this file. The
-script is run like so:
-
-    ./faceswap.py <head image> <face image>
-
-If successful, a file `output.jpg` will be produced with the facial features
-from `<head image>` replaced with the facial features from `<face image>`.
-
-"""
-
 import glob
 import os
 import random
-
 import cv2
 import dlib
 import numpy
+
+FACESWAP_SHAPEPREDICTOR_PATH = "./data/shape_predictor_68_face_landmarks.dat"
+FACESWAP_FOLDER_PATH = "./data/faceswaps/"
 
 SCALE_FACTOR = 1
 FEATHER_AMOUNT = 11

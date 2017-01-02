@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseServerError
-from tasks import faceSwapTask, faceBeautificationTask
+from FaceSwapApp.tasks import faceSwapTask, faceBeautificationTask
 import json
 
 FACE_SWAP = 0

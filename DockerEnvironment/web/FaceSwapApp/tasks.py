@@ -6,8 +6,8 @@ import cv2
 import base64
 import numpy as np
 
-from .align import faceSwapImages, NoFaces
-from .faceBeautifierWeb import beautifyIm_Web
+from FaceSwapApp.align import faceSwapImages, NoFaces
+from FaceSwapApp.faceBeautifierWeb import beautifyIm_Web
 
 
 def base64_to_image(imageb64):
