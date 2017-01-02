@@ -2,6 +2,7 @@ Django==1.8.1
 gunicorn==19.3.0
 psycopg2==2.6
 redis==2.10.3
+celery==3.1.23
 
 dlib==19.1.0
 matplotlib==1.5.3
