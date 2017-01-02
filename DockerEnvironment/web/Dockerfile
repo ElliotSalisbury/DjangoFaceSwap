@@ -13,13 +13,43 @@ RUN apt-get update && apt-get install -y \
     zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+#get the latest cmake
+RUN wget "https://cmake.org/files/v3.7/cmake-3.7.1-Linux-x86_64.sh" && sh ./cmake-3.7.1-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
+export PATH=/usr/local/bin:$PATH
+
+#get opencv
+RUN mkdir -p /usr/lib/opencv && cd /usr/lib/opencv && \
+    git clone https://github.com/Itseez/opencv.git && \
+    cd /usr/lib/opencv/opencv && git checkout 3.2.0
+RUN cd /usr/lib/opencv && \
+    git clone https://github.com/Itseez/opencv_contrib.git && \
+    cd /usr/lib/opencv/opencv_contrib && git checkout 3.2.0
+RUN pip install numpy
+RUN mkdir -p /usr/lib/opencv/build && cd /usr/lib/opencv/build && \
+    cmake -D CMAKE_BUILD_TYPE=RELEASE \
+        -D CMAKE_INSTALL_PREFIX=/usr/local \
+        -D INSTALL_C_EXAMPLES=ON \
+        -D INSTALL_PYTHON_EXAMPLES=ON \
+        -D OPENCV_EXTRA_MODULES_PATH=/usr/lib/opencv/opencv_contrib/modules \
+        -D BUILD_EXAMPLES=ON \
+        -D PYTHON3_EXECUTABLE=/usr/local/bin/python3.5 \
+        -D PYTHON3_INCLUDE=/usr/local/include/python3.5/ \
+        -D PYTHON3_LIBRARY=/usr/local/lib/libpython3.5.a \
+        -D PYTHON3_PACKAGES_PATH=/usr/local/lib/python3.5/site-packages \
+        -D PYTHON3_NUMPY_INCLUDE_DIRS=/usr/local/lib/python3.5/dist-packages/numpy/core/include \
+        /usr/lib/opencv/opencv
+RUN cd /usr/lib/opencv/build && \
+    make && make install && \
+    ldconfig
+
 # eos face fitting
-#RUN mkdir -p /usr/lib/eos
-#WORKDIR /usr/lib/eos
-#RUN git clone --recursive https://github.com/patrikhuber/eos.git -b devel && \
-#    mkdir build && cd build && \
-#    cmake -G ../eos -DCMAKE_INSTALL_PREFIX=../install/ -DEOS_GENERATE_PYTHON_BINDINGS=ON
-#    make && make install
+RUN mkdir -p /usr/lib/eos && cd /usr/lib/eos && \
+    git clone --recursive https://github.com/patrikhuber/eos.git -b devel
+
+RUN mkdir /usr/lib/eos/build && mkdir /usr/lib/eos/install && cd /usr/lib/eos/build && \
+    cmake -G "Unix Makefiles" /usr/lib/eos/eos -DCMAKE_INSTALL_PREFIX=../install/ -DEOS_GENERATE_PYTHON_BINDINGS=ON
+RUN cd /usr/lib/eos/build && make && make install
+RUN cp /usr/lib/eos/install/python/eos.cpython-35m-x86_64-linux-gnu.so /usr/local/lib/python3.5/site-packages
 
 #copy the python app across
 RUN mkdir -p /usr/src/app
