@@ -1,0 +1,94 @@
+{% extends 'objctify/base.html' %}
+{% load staticfiles %}
+
+
+{% block head_block %}
+<script>
+function post(path, parameters) {
+    var form = $('<form></form>');
+
+    form.attr("method", "post");
+    form.attr("action", path);
+
+    $.each(parameters, function(key, value) {
+        var field = $('<input></input>');
+
+        field.attr("type", "hidden");
+        field.attr("name", key);
+        field.attr("value", value);
+
+        form.append(field);
+    });
+
+    // The form needs to be a part of the document in
+    // order for us to be able to submit it.
+    $(document.body).append(form);
+    form.submit();
+}
+
+function uploadImage(input, gender) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            var imageb64 = e.target.result;
+
+            var path = "{% url 'upload' %}";
+            parameters = {"imageb64":imageb64, "type":0};
+            post(path, parameters);
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+$(function() {
+    $("#imgupload").change(function(){
+        uploadImage(this, "F");
+    });
+});
+</script>
+{% endblock %}
+
+{% block content_block %}
+	<h1>Objctify.Me</h1>
+
+    <h2>Use Artificial Intelligence to guess your attractiveness and automatically photoedit it better!</h2>
+
+    <p>Try our Examples</p>
+    <div id="exampleImages" class="carousel slide" data-ride="carousel">
+      <!-- Indicators -->
+      <ol class="carousel-indicators">
+        <li data-target="#exampleImages" data-slide-to="0" class="active"></li>
+        <li data-target="#exampleImages" data-slide-to="1"></li>
+        <li data-target="#exampleImages" data-slide-to="2"></li>
+        <li data-target="#exampleImages" data-slide-to="3"></li>
+      </ol>
+
+      <!-- Wrapper for slides -->
+      <div class="carousel-inner" role="listbox">
+        <div class="item active">
+          <img src="{% static "img/examples/lena.bmp" %}" alt="Lena">
+        </div>
+
+        <div class="item">
+          <img src="{% static "img/examples/test.png" %}" alt="Lena">
+        </div>
+      </div>
+
+      <!-- Left and right controls -->
+      <a class="left carousel-control" href="#exampleImages" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="right carousel-control" href="#exampleImages" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+
+    <input type='file' id="imgupload">Upload a photo</input>
+
+
+    <p>Disclaimer: Objctify.Me is trained on data gathered from reddits r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results too seriously.</p>
+{% endblock %}

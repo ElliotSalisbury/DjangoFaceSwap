@@ -1,0 +1,23 @@
+body {
+    background-color: #eeeeee;
+}
+
+#content {
+    background-color: #ffffff;
+
+    padding-top: 50px;
+    padding-bottom: 30px;
+    border-bottom-left-radius:10px;
+    border-bottom-right-radius:10px;
+}
+
+.profile {
+    text-align: center
+}
+.profile img{
+    width:180px;
+    height:240px;
+
+    margin-left: auto;
+    margin-right: auto;
+}

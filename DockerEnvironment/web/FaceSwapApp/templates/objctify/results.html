@@ -1,0 +1,50 @@
+{% extends 'objctify/base.html' %}
+{% load staticfiles %}
+
+
+{% block head_block %}
+<script>
+var processId = "{{ processId }}";
+
+function pollSwapTask(taskId) {
+	setTimeout(function () {
+		$.ajax({
+			type: "GET",
+			url: "{% url "api_GetResults" %}",
+			cache: false,
+			data: {
+				taskId: taskId
+			},
+			success: function (data) {
+				if (data.status == "FAILURE") {
+					//this image cannot be swapped, probably no faces
+					console.log(data.status);
+				}
+				else if (data.status == "SUCCESS") {
+                    $("#better").attr("src", data.image);
+				} else {
+					//all other status messages mean we should try again later
+					pollSwapTask(taskId);
+				}
+			},
+			error: function (data) {
+				console.log("error polling the faceswap server");
+			}
+		});
+    }, 100);
+}
+pollSwapTask(processId);
+</script>
+{% endblock %}
+
+{% block content_block %}
+	<h1>Objctify.Me</h1>
+
+    <h2>Results:</h2>
+    <img src="{{ uploadedIm }}">
+
+    <p>You are a 1!</p>
+    <p>here are our photoeditted versions!</p>
+    <img id="better" src="">
+
+{% endblock %}
