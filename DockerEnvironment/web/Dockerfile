@@ -36,27 +36,27 @@ RUN mkdir -p /usr/lib/opencv/build && cd /usr/lib/opencv/build && \
         -D PYTHON3_INCLUDE=/usr/local/include/python3.5/ \
         -D PYTHON3_LIBRARY=/usr/local/lib/libpython3.5.a \
         -D PYTHON3_PACKAGES_PATH=/usr/local/lib/python3.5/site-packages \
-        -D PYTHON3_NUMPY_INCLUDE_DIRS=/usr/local/lib/python3.5/dist-packages/numpy/core/include \
+        -D PYTHON3_NUMPY_INCLUDE_DIRS=/usr/local/lib/python3.5/site-packages/numpy/core/include \
         /usr/lib/opencv/opencv
-RUN cd /usr/lib/opencv/build && \
-    make && make install && \
-    ldconfig
-
-# eos face fitting
-RUN mkdir -p /usr/lib/eos && cd /usr/lib/eos && \
-    git clone --recursive https://github.com/patrikhuber/eos.git -b devel
-
-RUN mkdir /usr/lib/eos/build && mkdir /usr/lib/eos/install && cd /usr/lib/eos/build && \
-    cmake -G "Unix Makefiles" /usr/lib/eos/eos -DCMAKE_INSTALL_PREFIX=../install/ -DEOS_GENERATE_PYTHON_BINDINGS=ON
-RUN cd /usr/lib/eos/build && make && make install
-RUN cp /usr/lib/eos/install/python/eos.cpython-35m-x86_64-linux-gnu.so /usr/local/lib/python3.5/site-packages
-
-#copy the python app across
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
-COPY requirements.txt /usr/src/app/
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . /usr/src/app
-
+#RUN cd /usr/lib/opencv/build && \
+#    make && make install && \
+#    ldconfig
+#
+## eos face fitting
+#RUN mkdir -p /usr/lib/eos && cd /usr/lib/eos && \
+#    git clone --recursive https://github.com/patrikhuber/eos.git -b devel
+#
+#RUN mkdir /usr/lib/eos/build && mkdir /usr/lib/eos/install && cd /usr/lib/eos/build && \
+#    cmake -G "Unix Makefiles" /usr/lib/eos/eos -DCMAKE_INSTALL_PREFIX=../install/ -DEOS_GENERATE_PYTHON_BINDINGS=ON
+#RUN cd /usr/lib/eos/build && make && make install
+#RUN cp /usr/lib/eos/install/python/eos.cpython-35m-x86_64-linux-gnu.so /usr/local/lib/python3.5/site-packages
+#
+##copy the python app across
+#RUN mkdir -p /usr/src/app
+#WORKDIR /usr/src/app
+#
+#COPY requirements.txt /usr/src/app/
+#RUN pip install --no-cache-dir -r requirements.txt
+#
+#COPY . /usr/src/app
+#
