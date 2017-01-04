@@ -3,8 +3,8 @@ from django.shortcuts import render_to_response
 from FaceSwapApp.tasks import faceSwapTask, faceBeautificationTask
 import json
 
-FACE_SWAP = 0
-FACE_BEAUTIFICATION = 1
+FACE_SWAP = "0"
+FACE_BEAUTIFICATION = "1"
 
 TASKS = {FACE_SWAP: faceSwapTask,
          FACE_BEAUTIFICATION: faceBeautificationTask}
@@ -14,7 +14,7 @@ def index(request):
 
 def upload(request):
     imageb64 = request.POST.get("imageb64", None)
-    type = request.POST.get("taskType", FACE_SWAP)
+    type = request.POST.get("type", FACE_SWAP)
 
     # we didnt get the uploaded image, return an error
     if imageb64 is None:
@@ -42,7 +42,7 @@ def startImageProcessing(request):
 
 def getSwap(request):
     taskId = request.GET.get("taskId", None)
-    type = request.POST.get("taskType", FACE_SWAP)
+    type = request.POST.get("type", FACE_SWAP)
 
     reply = {}
 

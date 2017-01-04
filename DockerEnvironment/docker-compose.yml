@@ -19,9 +19,9 @@ celeryworker:
   links:
     - redis:redis
   volumes:
-    - /usr/src/app
+    - C:/Users/ellio/PycharmProjects/FaceSwap/DockerEnvironment/web:/usr/src/app
   env_file: .env
-  command: celery -A django_server worker --loglevel=INFO --concurrency=10 -n worker1.%h
+  command: celery -A django_server worker --loglevel=INFO --autoreload --concurrency=10 -n worker1.%h
 
 nginx:
   restart: always
@@ -46,7 +46,7 @@ postgres:
 redis:
   restart: always
   image: redis:latest
-  expose:
-    - "6379"
+  ports:
+    - "6379:6379"
   volumes:
     - redisdata:/data

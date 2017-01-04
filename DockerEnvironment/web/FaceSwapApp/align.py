@@ -5,8 +5,8 @@ import cv2
 import dlib
 import numpy
 
-FACESWAP_SHAPEPREDICTOR_PATH = "./data/shape_predictor_68_face_landmarks.dat"
-FACESWAP_FOLDER_PATH = "./data/faces/"
+DLIB_SHAPEPREDICTOR_PATH = os.environ['DLIB_SHAPEPREDICTOR_PATH']
+FACESWAP_FOLDER_PATH = os.environ['FACESWAP_FOLDER_PATH']
 
 SCALE_FACTOR = 1
 FEATHER_AMOUNT = 11
@@ -38,7 +38,7 @@ OVERLAY_POINTS = [
 COLOUR_CORRECT_BLUR_FRAC = 0.6
 
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor(FACESWAP_SHAPEPREDICTOR_PATH)
+predictor = dlib.shape_predictor(DLIB_SHAPEPREDICTOR_PATH)
 
 class TooManyFaces(Exception):
     pass

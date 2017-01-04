@@ -34,7 +34,7 @@ function uploadImage(input, gender) {
             var imageb64 = e.target.result;
 
             var path = "{% url 'upload' %}";
-            parameters = {"imageb64":imageb64, "type":0};
+            parameters = {"imageb64":imageb64, "type":1};
             post(path, parameters);
         };
 

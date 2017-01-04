@@ -13,7 +13,8 @@ function pollSwapTask(taskId) {
 			url: "{% url "api_GetResults" %}",
 			cache: false,
 			data: {
-				taskId: taskId
+				taskId: taskId,
+                type: "1"
 			},
 			success: function (data) {
 				if (data.status == "FAILURE") {
@@ -22,6 +23,7 @@ function pollSwapTask(taskId) {
 				}
 				else if (data.status == "SUCCESS") {
                     $("#better").attr("src", data.image);
+                    $("#better").attr("beautified", data.image);
 				} else {
 					//all other status messages mean we should try again later
 					pollSwapTask(taskId);
@@ -32,6 +34,15 @@ function pollSwapTask(taskId) {
 			}
 		});
     }, 100);
+
+    $(function() {
+        $("#better").hover(function(){
+            $("#better").attr("src", $("#orig").attr("src"));
+        },
+        function() {
+            $("#better").attr("src", $("#better").attr("beautified"));
+        })
+    });
 }
 pollSwapTask(processId);
 </script>
@@ -41,7 +52,7 @@ pollSwapTask(processId);
 	<h1>Objctify.Me</h1>
 
     <h2>Results:</h2>
-    <img src="{{ uploadedIm }}">
+    <img id="orig" src="{{ uploadedIm }}">
 
     <p>You are a 1!</p>
     <p>here are our photoeditted versions!</p>
