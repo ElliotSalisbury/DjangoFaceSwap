@@ -44,7 +44,7 @@ RUN cd /usr/lib/opencv/build && \
 
 # eos face fitting
 RUN mkdir -p /usr/lib/eos && cd /usr/lib/eos && \
-    git clone --recursive https://github.com/patrikhuber/eos.git -b devel
+    git clone --recursive https://github.com/ElliotSalisbury/eos.git -b devel
 
 RUN mkdir /usr/lib/eos/build && mkdir /usr/lib/eos/install && cd /usr/lib/eos/build && \
     cmake -G "Unix Makefiles" /usr/lib/eos/eos -DCMAKE_INSTALL_PREFIX=../install/ -DEOS_GENERATE_PYTHON_BINDINGS=ON
@@ -58,5 +58,5 @@ WORKDIR /usr/src/app
 COPY requirements.txt /usr/src/app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN cd /usr/src/app && git clone https://github.com/ElliotSalisbury/FaceAnalysis.git
+RUN cd /usr/src/app && git clone https://github.com/ElliotSalisbury/FaceAnalysis.git && mv ./FaceAnalysis/Beautifier ./FaceAnalysis/US10k ./FaceAnalysis/RateMe .
 COPY . /usr/src/app
