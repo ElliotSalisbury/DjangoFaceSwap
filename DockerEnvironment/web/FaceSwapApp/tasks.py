@@ -40,6 +40,7 @@ def faceSwapTask(imageb64):
 def faceBeautificationTask(uploaded):
     try:
         reply = {}
+        reply["images"] = []
         for upload in uploaded:
             image = upload_to_image(upload)
             rating, improved = beautifyIm_Web(image)
