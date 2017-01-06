@@ -8,9 +8,11 @@ function checkAndDisplayResults(data) {
     if (data.hasOwnProperty("result")){
         $("#orig").attr("src", resizedImages[0].dataUrl);
 
-        var imgData = data.result.images[0].data;
+        var imgData = data.result.images[0].improved;
         $("#better").attr("src", imgData);
         $("#better").attr("beautified", imgData);
+
+        $("#rating").html(data.result.images[0].rating);
     }
 }
 
@@ -182,7 +184,7 @@ $(function() {
     <h2>Results:</h2>
     <img id="orig" src="">
 
-    <p>You are a 1!</p>
+    <p>You are a <span id="rating">1</span>!</p>
     <p>here are our photoeditted versions!</p>
     <img id="better" src="">
 {% endblock %}

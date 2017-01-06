@@ -40,13 +40,12 @@ def faceSwapTask(imageb64):
 def faceBeautificationTask(uploaded):
     try:
         reply = {}
-        reply["images"] = []
         for upload in uploaded:
             image = upload_to_image(upload)
-            improved = beautifyIm_Web(image)
+            rating, improved = beautifyIm_Web(image)
             replyb64 = image_to_base64(improved)
 
-            reply["images"].append({"name":upload.name, "data":replyb64})
+            reply["images"].append({"name":upload.name, "improved":replyb64, "rating":rating})
         return reply
     except NoFaces as noFacesError:
         return None
