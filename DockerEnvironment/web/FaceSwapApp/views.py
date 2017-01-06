@@ -13,19 +13,19 @@ def index(request):
     return render_to_response('objctify/index.html')
 
 def upload(request):
-    imageb64 = request.POST.get("imageb64", None)
-    type = request.POST.get("type", FACE_SWAP)
+    if request.method == 'POST':
+        type = request.POST.get("type", FACE_SWAP)
+        images = request.FILES.getlist('images')
 
-    # we didnt get the uploaded image, return an error
-    if imageb64 is None:
-        return HttpResponseServerError("Image Upload Error")
+        # taskId = TASKS[type].apply_async((images,), expires=60 * 3)
+        taskId = 0
+        result = TASKS[type](images)
 
-    # send an image to be processed, but ignore the task if its taking longer than 3 minutes
-    result = TASKS[type].apply_async((imageb64,), expires=60 * 3)
+        context = {"originalImages": images, "type": type, "taskId": taskId, "result":result}
 
-    context = {"uploadedIm":imageb64, "type":type, "processId":result}
-
-    return render_to_response('objctify/results.html', context=context)
+        return render_to_response('objctify/results.html', context=context)
+    else:
+        return HttpResponseServerError("Must Use POST")
 
 def startImageProcessing(request):
     imageb64 = request.POST.get("imageb64", None)

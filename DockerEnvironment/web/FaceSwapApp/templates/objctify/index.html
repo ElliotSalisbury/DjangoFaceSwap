@@ -4,47 +4,100 @@
 
 {% block head_block %}
 <script>
-function post(path, parameters) {
-    var form = $('<form></form>');
+function dataURLToBlob(dataURL) {
+    var BASE64_MARKER = ';base64,';
+    if (dataURL.indexOf(BASE64_MARKER) == -1) {
+        var parts = dataURL.split(',');
+        var contentType = parts[0].split(':')[1];
+        var raw = parts[1];
 
-    form.attr("method", "post");
-    form.attr("action", path);
-
-    $.each(parameters, function(key, value) {
-        var field = $('<input></input>');
-
-        field.attr("type", "hidden");
-        field.attr("name", key);
-        field.attr("value", value);
-
-        form.append(field);
-    });
-
-    // The form needs to be a part of the document in
-    // order for us to be able to submit it.
-    $(document.body).append(form);
-    form.submit();
-}
-
-function uploadImage(input, gender) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-
-        reader.onload = function (e) {
-            var imageb64 = e.target.result;
-
-            var path = "{% url 'upload' %}";
-            parameters = {"imageb64":imageb64, "type":1};
-            post(path, parameters);
-        };
-
-        reader.readAsDataURL(input.files[0]);
+        return new Blob([raw], {type: contentType});
     }
+
+    var parts = dataURL.split(BASE64_MARKER);
+    var contentType = parts[0].split(':')[1];
+    var raw = window.atob(parts[1]);
+    var rawLength = raw.length;
+
+    var uInt8Array = new Uint8Array(rawLength);
+
+    for (var i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+    }
+
+    return new Blob([uInt8Array], {type: contentType});
 }
 
+function resizeImageFile(file) {
+    // Load the image
+    var reader = new FileReader();
+    reader.onload = function (readerEvent) {
+        var image = new Image();
+        image.onload = function (imageEvent) {
+            // Resize the image
+            var canvas = document.createElement('canvas'),
+                max_size = 544,// TODO : pull max size from a site config
+                width = image.width,
+                height = image.height;
+            if (width > height) {
+                if (width > max_size) {
+                    height *= max_size / width;
+                    width = max_size;
+                }
+            } else {
+                if (height > max_size) {
+                    width *= max_size / height;
+                    height = max_size;
+                }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+            var dataUrl = canvas.toDataURL('image/webp');
+            var resizedImage = new File([dataURLToBlob(dataUrl)], file.name);
+
+            resizedFiles.push(resizedImage);
+
+            if (resizedFiles.length == $('#imageselect')[0].files.length) {
+                var data = new FormData($("#uploadform")[0]);
+
+                for (var i=0; i<resizedFiles.length; i++){
+                    data.append("images", resizedFiles[i]);
+                }
+
+                $.ajax({
+                    url: "{% url 'upload' %}",
+                    data: data,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'POST',
+                    success: function(data){
+                        console.log(data)
+                    }
+                });
+            }
+        };
+        image.src = readerEvent.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+var resizedFiles = [];
 $(function() {
-    $("#imgupload").change(function(){
-        uploadImage(this, "F");
+    $('#imageselect').change(function(event) {
+        //for each file
+        for (var i = 0; i < event.target.files.length; i++) {
+            var file = event.target.files[i];
+
+            // Ensure it's an image
+            if (file.type.match(/image.*/)) {
+                resizeImageFile(file);
+            } else {
+                alert("The file you uploaded is not an image");
+                return;
+            }
+        }
     });
 });
 </script>
@@ -53,7 +106,7 @@ $(function() {
 {% block content_block %}
 	<h1>Objctify.Me</h1>
 
-    <h2>Use Artificial Intelligence to guess your attractiveness and automatically photoedit it better!</h2>
+    <h2>Our Artificial Intelligence algorithms rate your attractiveness and then tweak the photo to make it better!</h2>
 
     <p>Try our Examples</p>
     <div id="exampleImages" class="carousel slide" data-ride="carousel">
@@ -87,7 +140,11 @@ $(function() {
       </a>
     </div>
 
-    <input type='file' id="imgupload">Upload a photo</input>
+
+    <input id="imageselect" type="file" multiple>
+    <form id="uploadform" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="type" value="1">
+    </form>
 
 
     <p>Disclaimer: Objctify.Me is trained on data gathered from reddits r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results too seriously.</p>
