@@ -17,13 +17,12 @@ def upload(request):
         type = request.POST.get("type", FACE_SWAP)
         images = request.FILES.getlist('images')
 
-        # taskId = TASKS[type].apply_async((images,), expires=60 * 3)
-        taskId = 0
+        # task = TASKS[type].apply_async((images,), expires=60 * 3)
         result = TASKS[type](images)
 
-        context = {"originalImages": images, "type": type, "taskId": taskId, "result":result}
+        reply = {"type": type, "taskId": 0, "result":result}
 
-        return render_to_response('objctify/results.html', context=context)
+        return HttpResponse(json.dumps(reply), content_type="application/json")
     else:
         return HttpResponseServerError("Must Use POST")
 

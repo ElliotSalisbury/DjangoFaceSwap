@@ -4,6 +4,42 @@
 
 {% block head_block %}
 <script>
+function checkAndDisplayResults(data) {
+    if (data.hasOwnProperty("result")){
+        $("#orig").attr("src", resizedImages[0].dataUrl);
+
+        var imgData = data.result.images[0].data;
+        $("#better").attr("src", imgData);
+        $("#better").attr("beautified", imgData);
+    }
+}
+
+function uploadImages() {
+    if (resizedImages.length == $('#imageselect')[0].files.length) {
+        var data = new FormData($("#uploadform")[0]);
+
+        for (var i=0; i<resizedImages.length; i++){
+            var resizedImage = new File([dataURLToBlob(resizedImages[i].dataUrl)], resizedImages[i].filename);
+            data.append("images", resizedImage);
+        }
+
+        $.ajax({
+            url: "{% url 'upload' %}",
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST',
+            success: function(data){
+                checkAndDisplayResults(data);
+            },
+            error: function(data) {
+                alert("There was an error uploading images");
+            }
+        });
+    }
+}
+
 function dataURLToBlob(dataURL) {
     var BASE64_MARKER = ';base64,';
     if (dataURL.indexOf(BASE64_MARKER) == -1) {
@@ -54,36 +90,17 @@ function resizeImageFile(file) {
             canvas.height = height;
             canvas.getContext('2d').drawImage(image, 0, 0, width, height);
             var dataUrl = canvas.toDataURL('image/webp');
-            var resizedImage = new File([dataURLToBlob(dataUrl)], file.name);
 
-            resizedFiles.push(resizedImage);
+            resizedImages.push({"filename":file.name, "dataUrl":dataUrl});
 
-            if (resizedFiles.length == $('#imageselect')[0].files.length) {
-                var data = new FormData($("#uploadform")[0]);
-
-                for (var i=0; i<resizedFiles.length; i++){
-                    data.append("images", resizedFiles[i]);
-                }
-
-                $.ajax({
-                    url: "{% url 'upload' %}",
-                    data: data,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    type: 'POST',
-                    success: function(data){
-                        console.log(data)
-                    }
-                });
-            }
+            uploadImages();
         };
         image.src = readerEvent.target.result;
     };
     reader.readAsDataURL(file);
 }
 
-var resizedFiles = [];
+var resizedImages = [];
 $(function() {
     $('#imageselect').change(function(event) {
         //for each file
@@ -146,6 +163,14 @@ $(function() {
         <input type="hidden" name="type" value="1">
     </form>
 
-
     <p>Disclaimer: Objctify.Me is trained on data gathered from reddits r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results too seriously.</p>
+
+    <hr>
+
+    <h2>Results:</h2>
+    <img id="orig" src="">
+
+    <p>You are a 1!</p>
+    <p>here are our photoeditted versions!</p>
+    <img id="better" src="">
 {% endblock %}

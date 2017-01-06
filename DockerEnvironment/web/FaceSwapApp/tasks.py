@@ -5,7 +5,7 @@ from celery import shared_task
 import cv2
 import base64
 import numpy as np
-
+from PIL import Image
 from FaceSwapApp.align import faceSwapImages, NoFaces
 from FaceSwapApp.faceBeautifierWeb import beautifyIm_Web
 
@@ -15,6 +15,10 @@ def base64_to_image(imageb64):
     image = np.frombuffer(raw, dtype=np.uint8)
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
     return image
+
+def upload_to_image(upload):
+    image = np.array(Image.open(upload))
+    return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
 def image_to_base64(image):
     jpgdata = cv2.imencode('.webp',image)[1]
@@ -33,12 +37,16 @@ def faceSwapTask(imageb64):
         return None
 
 @shared_task
-def faceBeautificationTask(imageb64):
+def faceBeautificationTask(uploaded):
     try:
-        image = base64_to_image(imageb64)
-        swapped = beautifyIm_Web(image)
-        replyb64 = image_to_base64(swapped)
+        reply = {}
+        reply["images"] = []
+        for upload in uploaded:
+            image = upload_to_image(upload)
+            improved = beautifyIm_Web(image)
+            replyb64 = image_to_base64(improved)
 
-        return replyb64
+            reply["images"].append({"name":upload.name, "data":replyb64})
+        return reply
     except NoFaces as noFacesError:
         return None
