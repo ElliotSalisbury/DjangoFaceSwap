@@ -21,7 +21,7 @@ celeryworker:
   volumes:
     - /usr/src/app
   env_file: .env
-  command: celery -A django_server worker --loglevel=INFO --autoreload --concurrency=10 -n worker1.%h
+  command: celery -A django_server worker --loglevel=INFO --concurrency=10 -n worker1.%h
 
 nginx:
   restart: always
