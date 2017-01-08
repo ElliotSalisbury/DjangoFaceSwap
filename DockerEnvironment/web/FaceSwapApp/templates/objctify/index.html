@@ -246,12 +246,18 @@
         $("#example_carousel > a.left.carousel-control").click(function() {
             slideToNextActive(-1);
         });
+        $(window).on('resize', function(){
+            slideToNextActive(0);
+        });
 
         var midI = parseInt(examples.length / 2);
         for (var i=0; i<examples.length; i++) {
             var exampleLi = $("<li>");
-            var exampleIm = $('<img>');
-            exampleIm.attr("src", examples[i].result.images[0].original);
+            var exampleIm = new Image();
+            exampleIm.onload = function (imageEvent) {
+                slideToNextActive(0);
+            };
+            exampleIm.src = examples[i].result.images[0].original;
             if(i==midI) {
                 exampleLi.addClass("active");
             }
@@ -287,7 +293,7 @@
     </div>
 </div>
 <div class="row">
-    <label id="examplebtn" class="btn btn-default btn-file btn-center">
+    <label id="examplebtn" class="btn btn-primary col-xs-12 col-sm-6 col-md-4 col-sm-offset-3 col-md-offset-4">
         Use this photo
         <span class="glyphicon glyphicon-arrow-up" aria-hidden="true" style="margin-left: 6px;"></span>
     </label>
@@ -297,8 +303,8 @@
     Or
 </div>
 
-<div class="row" style="margin:20px;">
-    <label class="btn btn-info btn-file btn-center">
+<div class="row">
+    <label class="btn btn-info btn-file col-xs-12 col-sm-6 col-md-4 col-sm-offset-3 col-md-offset-4">
         Upload Your Own
         <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
         <input id="imageselect" class="btn" type="file" accept="image/*" capture="camera" multiple style="display: none;">
