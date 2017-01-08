@@ -4,276 +4,282 @@
 
 {% block head_block %}
 <style>
-.scrolls-x {
-    overflow-x: auto;
-    overflow-y: hidden;
-    height: 150px;
-    white-space:nowrap
-}
-.scrolls-x img {
-    position: relative;
-    height:100%;
-}
+    .scrolls-x {
+        overflow-x: auto;
+        overflow-y: hidden;
+        height: 150px;
+        white-space:nowrap
+    }
+    .scrolls-x img {
+        position: relative;
+        height:100%;
+    }
 </style>
 <script>
-function checkAndDisplayResults(data) {
-    $("#resultsmodal").modal("show");
-    if (data.hasOwnProperty("result")){
-        $('#originalImages').html();
-        $('#improvedImages').html();
-        allRatings = [];
-        for (var i=0; i<data.result.images.length; i++) {
-            //create original image
-            var orig = $('<img id="orig_'+i+'">');
-            orig.attr("src", resizedImages[i].dataUrl);
-            orig.appendTo('#originalImages');
+    function checkAndDisplayResults(data) {
+        if (data.hasOwnProperty("result")){
+            $('#originalImages').html();
+            $('#improvedImages').html();
+            allRatings = [];
+//        data.result.images.sort(function(a, b){return b.rating-a.rating});
+            for (var i=0; i<data.result.images.length; i++) {
+                //create original image
+                var orig = $('<img id="orig_'+i+'">');
+                orig.attr("src", resizedImages[i].dataUrl);
+                orig.appendTo('#originalImages');
 
-            //add the ratings to the array
-            allRatings.push(data.result.images[i].rating);
+                //add the ratings to the array
+                allRatings.push(data.result.images[i].rating);
 
-            //create the improved image
-            var improved = $('<img id="improved_'+i+'">');
-            improved.attr("src", data.result.images[i].improved);
-            improved.appendTo('#improvedImages');
+                //create the improved image
+                var improved = $('<img id="improved_'+i+'" class="hoverImpToOrig">');
+                improved.attr("src", data.result.images[i].improved);
+                improved.attr("improved", data.result.images[i].improved);
+                improved.attr("orig", resizedImages[i].dataUrl);
+                improved.appendTo('#improvedImages');
+            }
+
+            //set the rating
+            $("#rating").html(allRatings[0]);
+
+            $(".hoverImpToOrig").hover(function(event){
+                if (event.ctrlKey) {
+                    $(event.target).attr("src", $(event.target).attr("orig"));
+                }
+            }, function(event) {
+                $(event.target).attr("src", $(event.target).attr("improved"));
+            });
+
+            $("#resultsmodal").modal("show");
         }
-
-        //set the rating
-        $("#rating").html(allRatings[0]);
     }
-}
 
-function uploadImages() {
-    if (resizedImages.length == $('#imageselect')[0].files.length) {
-        var data = new FormData($("#uploadform")[0]);
+    function uploadImages() {
+        if (resizedImages.length == $('#imageselect')[0].files.length) {
+            var data = new FormData($("#uploadform")[0]);
 
-        for (var i=0; i<resizedImages.length; i++){
-            var resizedImage = new File([dataURLToBlob(resizedImages[i].dataUrl)], resizedImages[i].filename);
-            data.append("images", resizedImage);
+            for (var i=0; i<resizedImages.length; i++){
+                var resizedImage = new File([dataURLToBlob(resizedImages[i].dataUrl)], resizedImages[i].filename);
+                data.append("images", resizedImage);
+            }
+
+            $.ajax({
+                url: "{% url 'upload' %}",
+                data: data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                type: 'POST',
+                success: function(data){
+                    checkAndDisplayResults(data);
+                },
+                error: function(data) {
+                    alert("There was an error uploading images");
+                }
+            });
+        }
+    }
+
+    function dataURLToBlob(dataURL) {
+        var BASE64_MARKER = ';base64,';
+        if (dataURL.indexOf(BASE64_MARKER) == -1) {
+            var parts = dataURL.split(',');
+            var contentType = parts[0].split(':')[1];
+            var raw = parts[1];
+
+            return new Blob([raw], {type: contentType});
         }
 
-        $.ajax({
-            url: "{% url 'upload' %}",
-            data: data,
-            cache: false,
-            contentType: false,
-            processData: false,
-            type: 'POST',
-            success: function(data){
-                checkAndDisplayResults(data);
-            },
-            error: function(data) {
-                alert("There was an error uploading images");
+        var parts = dataURL.split(BASE64_MARKER);
+        var contentType = parts[0].split(':')[1];
+        var raw = window.atob(parts[1]);
+        var rawLength = raw.length;
+
+        var uInt8Array = new Uint8Array(rawLength);
+
+        for (var i = 0; i < rawLength; ++i) {
+            uInt8Array[i] = raw.charCodeAt(i);
+        }
+
+        return new Blob([uInt8Array], {type: contentType});
+    }
+
+    function resizeImageFile(file) {
+        // Load the image
+        var reader = new FileReader();
+        reader.onload = function (readerEvent) {
+            var image = new Image();
+            image.onload = function (imageEvent) {
+                // Resize the image
+                var canvas = document.createElement('canvas'),
+                        max_size = 544,// TODO : pull max size from a site config
+                        width = image.width,
+                        height = image.height;
+                if (width > height) {
+                    if (width > max_size) {
+                        height *= max_size / width;
+                        width = max_size;
+                    }
+                } else {
+                    if (height > max_size) {
+                        width *= max_size / height;
+                        height = max_size;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+                var dataUrl = canvas.toDataURL('image/webp');
+
+                resizedImages.push({"filename":file.name, "dataUrl":dataUrl});
+
+                uploadImages();
+            };
+            image.src = readerEvent.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    var resizedImages = [];
+    $(function() {
+        $('#imageselect').change(function(event) {
+            resizedImages = [];
+            //for each file
+            for (var i = 0; i < event.target.files.length; i++) {
+                var file = event.target.files[i];
+
+                // Ensure it's an image
+                if (file.type.match(/image.*/)) {
+                    resizeImageFile(file);
+                } else {
+                    alert("The file you uploaded is not an image");
+                    return;
+                }
             }
         });
-    }
-}
 
-function dataURLToBlob(dataURL) {
-    var BASE64_MARKER = ';base64,';
-    if (dataURL.indexOf(BASE64_MARKER) == -1) {
-        var parts = dataURL.split(',');
-        var contentType = parts[0].split(':')[1];
-        var raw = parts[1];
-
-        return new Blob([raw], {type: contentType});
-    }
-
-    var parts = dataURL.split(BASE64_MARKER);
-    var contentType = parts[0].split(':')[1];
-    var raw = window.atob(parts[1]);
-    var rawLength = raw.length;
-
-    var uInt8Array = new Uint8Array(rawLength);
-
-    for (var i = 0; i < rawLength; ++i) {
-        uInt8Array[i] = raw.charCodeAt(i);
-    }
-
-    return new Blob([uInt8Array], {type: contentType});
-}
-
-function resizeImageFile(file) {
-    // Load the image
-    var reader = new FileReader();
-    reader.onload = function (readerEvent) {
-        var image = new Image();
-        image.onload = function (imageEvent) {
-            // Resize the image
-            var canvas = document.createElement('canvas'),
-                max_size = 544,// TODO : pull max size from a site config
-                width = image.width,
-                height = image.height;
-            if (width > height) {
-                if (width > max_size) {
-                    height *= max_size / width;
-                    width = max_size;
-                }
-            } else {
-                if (height > max_size) {
-                    width *= max_size / height;
-                    height = max_size;
-                }
+        resizedImages = [
+            {
+                dataUrl:"https://i.vimeocdn.com/portrait/58832_300x300"
+            },
+            {
+                dataUrl:"https://lh4.ggpht.com/wKrDLLmmxjfRG2-E-k5L5BUuHWpCOe4lWRF7oVs1Gzdn5e5yvr8fj-ORTlBF43U47yI=w300"
+            },
+        ];
+        stuff = {
+            result: {
+                images: [
+                    {
+                        improved: "https://lh4.ggpht.com/wKrDLLmmxjfRG2-E-k5L5BUuHWpCOe4lWRF7oVs1Gzdn5e5yvr8fj-ORTlBF43U47yI=w300",
+                        rating: 5.2
+                    },
+                    {
+                        improved: "https://i.vimeocdn.com/portrait/58832_300x300",
+                        rating: 5.8
+                    }
+                ]
             }
-            canvas.width = width;
-            canvas.height = height;
-            canvas.getContext('2d').drawImage(image, 0, 0, width, height);
-            var dataUrl = canvas.toDataURL('image/webp');
-
-            resizedImages.push({"filename":file.name, "dataUrl":dataUrl});
-
-            uploadImages();
         };
-        image.src = readerEvent.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-var resizedImages = [];
-$(function() {
-    $('#imageselect').change(function(event) {
-        resizedImages = [];
-        //for each file
-        for (var i = 0; i < event.target.files.length; i++) {
-            var file = event.target.files[i];
-
-            // Ensure it's an image
-            if (file.type.match(/image.*/)) {
-                resizeImageFile(file);
-            } else {
-                alert("The file you uploaded is not an image");
-                return;
-            }
-        }
+        checkAndDisplayResults(stuff);
     });
-
-    $("#better").hover(function(event){
-        if (event.ctrlKey) {
-            $("#better").attr("src", $("#orig").attr("src"));
-        }
-    },
-    function() {
-        $("#better").attr("src", $("#better").attr("beautified"));
-    });
-
-    resizedImages = [
-        {
-            dataUrl:"https://i.vimeocdn.com/portrait/58832_300x300"
-        },
-        {
-            dataUrl:"https://i.vimeocdn.com/portrait/58832_300x300"
-        },
-    ]
-    stuff = {
-        result: {
-            images: [
-                {
-                    improved: "https://i.vimeocdn.com/portrait/58832_300x300",
-                    rating: 5.2
-                },
-                {
-                    improved: "https://i.vimeocdn.com/portrait/58832_300x300",
-                    rating: 5.8
-                }
-            ]
-        }
-    };
-    checkAndDisplayResults(stuff);
-});
 </script>
 {% endblock %}
 
 {% block content_block %}
-    <div class="row center-text">
-        <h1 class="title">Objctify Me</h1>
-    </div>
-    <div class="row center-text">
-        <h2>Our Artificial Intelligence algorithms rate your attractiveness and then tweak the photo to make it better!</h2>
-    </div>
+<div class="row center-text">
+    <h1 class="title">Objctify Me</h1>
+</div>
+<div class="row center-text">
+    <h2>Our Artificial Intelligence algorithms rate your attractiveness and then tweak the photo to make it better!</h2>
+</div>
 
-    <div class="row">
-        <p>Try our examples or upload your own below:</p>
-        <div id="exampleImages" class="carousel slide" data-ride="carousel" >
-          <!-- Indicators -->
-          <ol class="carousel-indicators">
+<div class="row">
+    <p>Try our examples or upload your own below:</p>
+    <div id="exampleImages" class="carousel slide" data-ride="carousel" >
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
             <li data-target="#exampleImages" data-slide-to="0" class="active"></li>
             <li data-target="#exampleImages" data-slide-to="1"></li>
             <li data-target="#exampleImages" data-slide-to="2"></li>
             <li data-target="#exampleImages" data-slide-to="3"></li>
-          </ol>
+        </ol>
 
-          <!-- Wrapper for slides -->
-          <div class="carousel-inner" role="listbox" style="height: 300px">
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner" role="listbox" style="height: 300px">
             <div class="item active">
-              <img src="{% static "img/examples/lena.bmp" %}" alt="Lena">
+                <img src="{% static "img/examples/lena.bmp" %}" alt="Lena">
             </div>
 
             <div class="item">
-              <img src="{% static "img/examples/test.png" %}" alt="Lena">
+                <img src="{% static "img/examples/test.png" %}" alt="Lena">
             </div>
-          </div>
+        </div>
 
-          <!-- Left and right controls -->
-          <a class="left carousel-control" href="#exampleImages" role="button" data-slide="prev">
+        <!-- Left and right controls -->
+        <a class="left carousel-control" href="#exampleImages" role="button" data-slide="prev">
             <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
             <span class="sr-only">Previous</span>
-          </a>
-          <a class="right carousel-control" href="#exampleImages" role="button" data-slide="next">
+        </a>
+        <a class="right carousel-control" href="#exampleImages" role="button" data-slide="next">
             <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
             <span class="sr-only">Next</span>
-          </a>
-        </div>
+        </a>
     </div>
+</div>
 
-    <div class="row">
-        <label class="btn btn-info btn-file center-text">
-            Upload Your Own
-            <input id="imageselect" class="btn" type="file" accept="image/*" capture="camera" multiple style="display: none;">
-        </label>
-        <form id="uploadform" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="type" value="1">
-        </form>
-    </div>
+<div class="row">
+    <label class="btn btn-info btn-file col-md-2 col-md-offset-5">
+        Upload Your Own
+        <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
+        <input id="imageselect" class="btn" type="file" accept="image/*" capture="camera" multiple style="display: none;">
+    </label>
+    <form id="uploadform" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="type" value="1">
+    </form>
+</div>
 
-    <div class="row">
-        <p>Disclaimer: Objctify.Me is trained on data gathered from reddits r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results too seriously.</p>
-        <p>Uploaded data may be stored in order to improve the algorithm, but will not be shared with others</p>
-    </div>
+<div class="row">
+    <p>Disclaimer: Objctify.Me is trained on data gathered from reddits r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results too seriously.</p>
+    <p>Uploaded data may be stored in order to improve the algorithm, but will not be shared with others</p>
+</div>
+{% endblock %}
 
-    <div id="resultsmodal" class="modal fade" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
+{% block end_body_block %}
+<div id="resultsmodal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Results:</h4>
-          </div>
-          <div class="modal-body">
-              <!--<div class="row">-->
-                  <!--<div class="col-xs-12">-->
-                      <!--<div id="originalImages" class="scrolls-x">-->
-                      <!--</div>-->
-                  <!--</div>-->
-              <!--</div>-->
-              <div class="row" style="text-align: center">
-                  <p>Our algorithms rate you:</p>
-                  <span id="rating" style="font-size: 50px; font-weight: bold;">1</span>
-              </div>
-              <div class="row">
-                  <div class="col-xs-12">
-                    <p>Below are our tweaked images (ctrl+hover over them to see the original):</p>
-                    <hr>
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-xs-12">
-                      <div id="improvedImages" class="scrolls-x">
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Results:</h4>
+            </div>
+            <div class="modal-body">
+                <!--<div class="row">-->
+                <!--<div class="col-xs-12">-->
+                <!--<div id="originalImages" class="scrolls-x">-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--</div>-->
+                <div class="row" style="text-align: center">
+                    <p>Our algorithms rate you:</p>
+                    <span id="rating" style="font-size: 50px; font-weight: bold;">1</span>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p>Below are our tweaked images (ctrl+hover over them to see the original):</p>
+                        <hr>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div id="improvedImages" class="scrolls-x">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
         </div>
-      </div>
     </div>
+</div>
 {% endblock %}
