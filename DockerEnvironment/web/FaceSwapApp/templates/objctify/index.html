@@ -104,6 +104,24 @@
             });
 
             $("#resultsmodal").modal("show");
+        }else {
+            setTimeout(function () {
+		        $.ajax({
+                    type: "GET",
+                    url: "{% url 'api_GetResults' %}",
+                    cache: false,
+                    data: {
+                        taskId: data.taskId,
+                        type: "1"
+                    },
+                    success: function (data) {
+                        checkAndDisplayResults(data);
+                    },
+                    error: function (data) {
+                        console.log("error polling the faceswap server");
+                    }
+		        });
+            }, 500);
         }
     }
 

@@ -3,7 +3,7 @@ from django.conf.urls import url
 from FaceSwapApp import views
 
 urlpatterns = [url(r'^$', views.index, name='home'),
-               url(r'^$', views.index, name='about'),
+               url(r'^about$', views.about, name='about'),
                url(r'^uploadImage$', views.upload, name='upload'),
 
                url(r'^api/startProcess$', views.startImageProcessing, name='api_StartProcess'),

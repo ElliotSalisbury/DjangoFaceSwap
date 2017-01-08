@@ -11,16 +11,18 @@ TASKS = {FACE_SWAP: faceSwapTask,
 
 def index(request):
     return render_to_response('objctify/index.html')
+def about(request):
+    return render_to_response('objctify/about.html')
 
 def upload(request):
     if request.method == 'POST':
         type = request.POST.get("type", FACE_SWAP)
         images = request.FILES.getlist('images')
 
-        # task = TASKS[type].apply_async((images,), expires=60 * 3)
-        result = TASKS[type](images)
+        task = TASKS[type].apply_async((images,), expires=60 * 3)
+        # result = TASKS[type](images)
 
-        reply = {"type": type, "taskId": 0, "result":result}
+        reply = {"type": type, "taskId":task.taskId,}# "result":result}
 
         return HttpResponse(json.dumps(reply), content_type="application/json")
     else:
