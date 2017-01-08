@@ -20,6 +20,20 @@ def upload_to_image(upload):
     image = np.array(Image.open(upload))
     return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
+def ensureImageLessThanMax(im, maxsize=512):
+    height, width, depth = im.shape
+    if height > maxsize or width > maxsize:
+        if width > height:
+            ratio = maxsize / float(width)
+            width = maxsize
+            height = int(height * ratio)
+        else:
+            ratio = maxsize / float(height)
+            height = maxsize
+            width = int(width * ratio)
+        im = cv2.resize(im,(width,height))
+    return im
+
 def image_to_base64(image):
     jpgdata = cv2.imencode('.webp',image)[1]
     b64 = "data:image/webp;base64,"+base64.b64encode(jpgdata).decode('utf-8')
@@ -43,6 +57,7 @@ def faceBeautificationTask(uploaded):
         reply["images"] = []
         for upload in uploaded:
             image = upload_to_image(upload)
+            image = ensureImageLessThanMax(image)
             rating, improved = beautifyIm_Web(image)
             replyb64 = image_to_base64(improved)
 
