@@ -52,11 +52,11 @@ def faceSwapTask(imageb64):
         return None
 
 @shared_task
-def faceBeautificationTask(uploadedId):
+def faceBeautificationTask(uploadedIds):
     try:
         reply = {}
         reply["images"] = []
-        for id in uploadedId:
+        for id in uploadedIds:
             uploadedImage = UploadedImage.objects.get(pk=id)
             image = upload_to_image(uploadedImage.image)
             image = ensureImageLessThanMax(image)

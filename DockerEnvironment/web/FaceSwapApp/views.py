@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render_to_response
-from django.db.transaction import atomic
+from django.db import transaction
 from FaceSwapApp.tasks import faceSwapTask, faceBeautificationTask
 from FaceSwapApp.models import ImageProcessingRequest, UploadedImage
 from ipware.ip import get_ip
@@ -12,8 +12,8 @@ FACE_BEAUTIFICATION = "1"
 TASKS = {FACE_SWAP: faceSwapTask,
          FACE_BEAUTIFICATION: faceBeautificationTask}
 
-@atomic()
-def save_upload_request(request, type, images):
+@transaction.atomic()
+def save_upload_request(request, type, images, task):
     ipr = ImageProcessingRequest(ip=get_ip(request), type=type)
     ipr.save()
     uis = []
@@ -21,7 +21,16 @@ def save_upload_request(request, type, images):
         ui = UploadedImage(image=image, filename=image.name, request=ipr)
         uis.append(ui)
     UploadedImage.objects.bulk_create(uis)
+
+    UIids = [ui.id for ui in uis]
+    transaction.on_commit(lambda:startProcessingTask(task, UIids, request))
     return ipr, uis
+
+def startProcessingTask(task, UIids, request=None):
+    result = task.apply_async((UIids,), expires=60 * 3)
+    if request:
+        request.session["taskId"] = result.task_id
+    return result
 
 def index(request):
     return render_to_response('objctify/index.html')
@@ -33,13 +42,9 @@ def upload(request):
         type = request.POST.get("type", FACE_SWAP)
         images = request.FILES.getlist('images')
 
-        IPR, UIs = save_upload_request(request, type, images)
-        UIids = [UI.id for UI in UIs]
+        IPR, UIs = save_upload_request(request, type, images, TASKS[type])
 
-        task = TASKS[type].apply_async((UIids,), expires=60 * 3)
-        # result = TASKS[type](UIids)
-
-        reply = {"type": type, "taskId":task.task_id,}# "result":result}
+        reply = {"type": type, "taskId":-1,}# "result":result}
 
         return HttpResponse(json.dumps(reply), content_type="application/json")
     else:
@@ -64,7 +69,10 @@ def getSwap(request):
 
     reply = {"taskId":taskId, "type":type}
 
-    if taskId:
+    if taskId == -1 and 'taskId' in request.session:
+        taskId = request.session["taskId"]
+
+    if taskId and taskId != -1:
         #get the results from celery
         result = TASKS[type].AsyncResult(taskId)
         reply["status"] = result.status
