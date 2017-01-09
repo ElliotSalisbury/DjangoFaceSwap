@@ -1,6 +1,9 @@
 from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render_to_response
+from django.db.transaction import atomic
 from FaceSwapApp.tasks import faceSwapTask, faceBeautificationTask
+from FaceSwapApp.models import ImageProcessingRequest, UploadedImage
+from ipware.ip import get_ip
 import json
 
 FACE_SWAP = "0"
@@ -8,6 +11,17 @@ FACE_BEAUTIFICATION = "1"
 
 TASKS = {FACE_SWAP: faceSwapTask,
          FACE_BEAUTIFICATION: faceBeautificationTask}
+
+@atomic()
+def save_upload_request(request, type, images):
+    ipr = ImageProcessingRequest(ip=get_ip(request), type=type)
+    ipr.save()
+    uis = []
+    for image in images:
+        ui = UploadedImage(image=image, filename=image.name, request=ipr)
+        uis.append(ui)
+    UploadedImage.objects.bulk_create(uis)
+    return ipr, uis
 
 def index(request):
     return render_to_response('objctify/index.html')
@@ -19,7 +33,9 @@ def upload(request):
         type = request.POST.get("type", FACE_SWAP)
         images = request.FILES.getlist('images')
 
-        task = TASKS[type].apply_async((images,), expires=60 * 3)
+        IPR, UIs = save_upload_request(request, type, images)
+
+        task = TASKS[type].apply_async((UIs,), expires=60 * 3)
         # result = TASKS[type](images)
 
         reply = {"type": type, "taskId":task.taskId,}# "result":result}

@@ -123,3 +123,5 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
 )
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
