@@ -64,8 +64,8 @@
         {result: {
             images: [{
                 original: "{% static 'img/examples/test.png' %}",
-                improved: "https://i.vimeocdn.com/portrait/58832_300x300",
-                rating: 5.8,
+                improved: "{% static 'img/examples/test_improved.jpg' %}",
+                rating: 5.82,
                 name: "test.png"
             }]
         }},
@@ -132,7 +132,7 @@
             $("#resultswaiting").show();
             $("#resultserror").hide();
             $("#resultssucessful").hide();
-            if (retryCount < 100) {
+            if (retryCount < 10) {
                 setTimeout(function () {
                     $.ajax({
                         type: "GET",

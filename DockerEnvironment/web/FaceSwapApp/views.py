@@ -12,7 +12,7 @@ FACE_BEAUTIFICATION = "1"
 TASKS = {FACE_SWAP: faceSwapTask,
          FACE_BEAUTIFICATION: faceBeautificationTask}
 
-@transaction.atomic()
+# @transaction.atomic()
 def save_upload_request(request, type, images, task):
     ipr = ImageProcessingRequest(ip=get_ip(request), type=type)
     ipr.save()
@@ -22,8 +22,6 @@ def save_upload_request(request, type, images, task):
         uis.append(ui)
     UploadedImage.objects.bulk_create(uis)
 
-    UIids = [ui.id for ui in uis]
-    transaction.on_commit(lambda:startProcessingTask(task, UIids, request))
     return ipr, uis
 
 def startProcessingTask(task, UIids, request=None):
@@ -43,8 +41,11 @@ def upload(request):
         images = request.FILES.getlist('images')
 
         IPR, UIs = save_upload_request(request, type, images, TASKS[type])
+        UIids = [ui.id for ui in UIs]
 
-        reply = {"type": type, "taskId":-1,}# "result":result}
+        result = startProcessingTask(TASKS[type], UIids, request)
+
+        reply = {"type": type, "taskId":result.task_id,}# "result":result}
 
         return HttpResponse(json.dumps(reply), content_type="application/json")
     else:
@@ -79,10 +80,10 @@ def getSwap(request):
 
         #if the task has finished
         if reply["status"] == "SUCCESS":
-            #get the image
-            reply["image"] = result.get()
+            #get the results
+            reply["result"] = result.get()
             #if no image has been returned (probably no faces)
-            if reply["image"] is None:
+            if reply["result"] is None:
                 #return the task as failed, so that JS stops polling
                 reply["status"] = "FAILURE"
         return HttpResponse(json.dumps(reply), content_type="application/json")

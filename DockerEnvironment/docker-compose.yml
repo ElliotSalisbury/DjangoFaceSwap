@@ -8,6 +8,7 @@ web:
     - redis:redis
   volumes:
     - /usr/src/app
+    - /uploads
   env_file: .env
   environment:
     DEBUG: 'true'
@@ -17,11 +18,12 @@ celeryworker:
   restart: always
   build: ./web
   links:
+    - postgres:postgres
     - redis:redis
-  volumes:
-    - /usr/src/app
+  volumes_from:
+    - web
   env_file: .env
-  command: celery -A django_server worker --loglevel=INFO --concurrency=10 -n worker1.%h
+  command: celery -A django_server worker --loglevel=INFO --concurrency=1 -n worker1.%h
 
 nginx:
   restart: always
