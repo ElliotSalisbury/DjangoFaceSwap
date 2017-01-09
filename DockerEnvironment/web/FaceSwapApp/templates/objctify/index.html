@@ -115,7 +115,7 @@
             }
 
             //set the rating
-            $("#rating").html(allRatings[0]);
+            $("#rating").html(parseFloat(allRatings[0]).toFixed(2));
 
             $(".hoverImpToOrig").hover(function(event){
                 if (event.ctrlKey) {
