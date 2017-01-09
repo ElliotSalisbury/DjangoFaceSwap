@@ -57,14 +57,16 @@
             images: [{
                 original: "{% static 'img/examples/lena.bmp' %}",
                 improved: "https://lh4.ggpht.com/wKrDLLmmxjfRG2-E-k5L5BUuHWpCOe4lWRF7oVs1Gzdn5e5yvr8fj-ORTlBF43U47yI=w300",
-                rating: 5.2
+                rating: 5.2,
+                name: "lena.bmp"
             }]
         }},
         {result: {
             images: [{
                 original: "{% static 'img/examples/test.png' %}",
                 improved: "https://i.vimeocdn.com/portrait/58832_300x300",
-                rating: 5.8
+                rating: 5.8,
+                name: "test.png"
             }]
         }},
     ];
@@ -124,11 +126,13 @@
             });
 
             $("#resultswaiting").hide();
+            $("#resultserror").hide();
             $("#resultssucessful").show();
         }else {
             $("#resultswaiting").show();
+            $("#resultserror").hide();
             $("#resultssucessful").hide();
-            if (retryCount < 10) {
+            if (retryCount < 100) {
                 setTimeout(function () {
                     $.ajax({
                         type: "GET",
@@ -139,17 +143,28 @@
                             type: "1"
                         },
                         success: function (data) {
-                            checkAndDisplayResults(data, retryCount+1);
+                            if (data.status == "FAILURE") {
+                                displayErrorModal("error 500: "+data.reason);
+                            } else {
+                                checkAndDisplayResults(data, retryCount + 1);
+                            }
                         },
                         error: function (data) {
-                            console.log("error polling the faceswap server");
+                            displayErrorModal("error polling the faceswap server");
                         }
                     });
                 }, 500);
             } else {
-                console.log("error retried too many times")
+                displayErrorModal("error retried too many times");
             }
         }
+    }
+
+    function displayErrorModal(message) {
+        $("#resultswaiting").hide();
+        $("#resultserror").show();
+        $("#resultssucessful").hide();
+        $("#resultserrorbody").html(message);
     }
 
     function uploadImages() {
@@ -375,6 +390,15 @@
             </div>
             <div class="modal-body">
                 <p>Hold tight while we process your image.</p>
+            </div>
+        </div>
+        <div id="resultserror" class="modal-content" style="display:none;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Error:</h4>
+            </div>
+            <div class="modal-body" id="resultserrorbody">
+                <p>There has been an error</p>
             </div>
         </div>
         <div id="resultssucessful" class="modal-content" style="display:none;">
