@@ -8,6 +8,7 @@ import numpy as np
 from PIL import Image
 from FaceSwapApp.align import faceSwapImages, NoFaces
 from FaceSwapApp.faceBeautifierWeb import beautifyIm_Web
+from FaceSwapApp.models import UploadedImage
 
 
 def base64_to_image(imageb64):
@@ -51,17 +52,18 @@ def faceSwapTask(imageb64):
         return None
 
 @shared_task
-def faceBeautificationTask(uploaded):
+def faceBeautificationTask(uploadedId):
     try:
         reply = {}
         reply["images"] = []
-        for upload in uploaded:
-            image = upload_to_image(upload)
+        for id in uploadedId:
+            uploadedImage = UploadedImage.objects.get(pk=id)
+            image = upload_to_image(uploadedImage.image)
             image = ensureImageLessThanMax(image)
             rating, improved = beautifyIm_Web(image)
             replyb64 = image_to_base64(improved)
 
-            reply["images"].append({"name":upload.name, "improved":replyb64, "rating":rating})
+            reply["images"].append({"name":uploadedImage.filename, "improved":replyb64, "rating":rating})
         return reply
     except NoFaces as noFacesError:
         return None

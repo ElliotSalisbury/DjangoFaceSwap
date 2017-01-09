@@ -34,11 +34,12 @@ def upload(request):
         images = request.FILES.getlist('images')
 
         IPR, UIs = save_upload_request(request, type, images)
+        UIids = [UI.id for UI in UIs]
 
-        task = TASKS[type].apply_async((UIs,), expires=60 * 3)
-        # result = TASKS[type](images)
+        task = TASKS[type].apply_async((UIids,), expires=60 * 3)
+        # result = TASKS[type](UIids)
 
-        reply = {"type": type, "taskId":task.taskId,}# "result":result}
+        reply = {"type": type, "taskId":task.task_id,}# "result":result}
 
         return HttpResponse(json.dumps(reply), content_type="application/json")
     else:
@@ -59,9 +60,9 @@ def startImageProcessing(request):
 
 def getSwap(request):
     taskId = request.GET.get("taskId", None)
-    type = request.POST.get("type", FACE_SWAP)
+    type = request.GET.get("type", FACE_SWAP)
 
-    reply = {}
+    reply = {"taskId":taskId, "type":type}
 
     if taskId:
         #get the results from celery

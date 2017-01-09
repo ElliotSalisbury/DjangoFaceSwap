@@ -69,7 +69,12 @@
         }},
     ];
 
-    function checkAndDisplayResults(data) {
+    function checkAndDisplayResults(data, retryCount) {
+        if (retryCount === undefined) {
+            retryCount = 0;
+        }
+
+        $("#resultsmodal").modal("show");
         if (data.hasOwnProperty("result")){
             $('#originalImages').html("");
             $('#improvedImages').html("");
@@ -118,25 +123,32 @@
                 $(event.target).attr("src", $(event.target).attr("improved"));
             });
 
-            $("#resultsmodal").modal("show");
+            $("#resultswaiting").hide();
+            $("#resultssucessful").show();
         }else {
-            setTimeout(function () {
-		        $.ajax({
-                    type: "GET",
-                    url: "{% url 'api_GetResults' %}",
-                    cache: false,
-                    data: {
-                        taskId: data.taskId,
-                        type: "1"
-                    },
-                    success: function (data) {
-                        checkAndDisplayResults(data);
-                    },
-                    error: function (data) {
-                        console.log("error polling the faceswap server");
-                    }
-		        });
-            }, 500);
+            $("#resultswaiting").show();
+            $("#resultssucessful").hide();
+            if (retryCount < 10) {
+                setTimeout(function () {
+                    $.ajax({
+                        type: "GET",
+                        url: "{% url 'api_GetResults' %}",
+                        cache: false,
+                        data: {
+                            taskId: data.taskId,
+                            type: "1"
+                        },
+                        success: function (data) {
+                            checkAndDisplayResults(data, retryCount+1);
+                        },
+                        error: function (data) {
+                            console.log("error polling the faceswap server");
+                        }
+                    });
+                }, 500);
+            } else {
+                console.log("error retried too many times")
+            }
         }
     }
 
@@ -356,7 +368,16 @@
 {% block end_body_block %}
 <div id="resultsmodal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
+        <div id="resultswaiting" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Waiting:</h4>
+            </div>
+            <div class="modal-body">
+                <p>Hold tight while we process your image.</p>
+            </div>
+        </div>
+        <div id="resultssucessful" class="modal-content" style="display:none;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Results:</h4>
