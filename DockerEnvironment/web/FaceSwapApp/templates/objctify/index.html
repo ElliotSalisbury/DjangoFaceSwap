@@ -7,21 +7,17 @@
     body {
         overflow-x: hidden;
     }
-    .scrolls-x {
-        overflow-x: auto;
-        overflow-y: hidden;
-        height: 150px;
+    .scrolls-y {
+        overflow-x: hidden;
+        overflow-y: auto;
         white-space:nowrap
-    }
-    .scrolls-x img {
-        position: relative;
-        height:100%;
     }
 
     #example_carousel {
         position: relative;
         height: 200px;
         margin-bottom: 40px;
+        border: 1px solid rgb(240,240,240);
     }
     #example_carousel ul{
         position: relative;
@@ -79,9 +75,10 @@
 //        data.result.images.sort(function(a, b){return b.rating-a.rating});
             for (var i=0; i<data.result.images.length; i++) {
                 //create original image
-//                var orig = $('<img id="orig_'+i+'">');
-//                orig.attr("src", resizedImages[i].dataUrl);
-//                orig.appendTo('#originalImages');
+                var orig = $("<img>");
+                orig.attr("src", resizedImages[i].dataUrl);
+                orig.addClass("img-responsive");
+                orig.appendTo('#originalImages');
 
                 //add the ratings to the array
                 allRatings.push(data.result.images[i].rating);
@@ -103,7 +100,7 @@
                 image.src = data.result.images[i].improved;
                 $(image).attr("improved", data.result.images[i].improved);
                 $(image).attr("orig", resizedImages[i].dataUrl);
-                $(image).addClass("hoverImpToOrig");
+                $(image).addClass("hoverImpToOrig img-responsive");
 
                 link.append(image);
                 link.appendTo('#improvedImages');
@@ -291,7 +288,7 @@
         $("#examplebtn").click(function(event) {
             var i = $("#example_carousel > ul > li.active").index();
             var exampleData = examples[i];
-            resizedImages = [exampleData.result.images[0].original];
+            resizedImages = [{dataUrl:exampleData.result.images[0].original}];
             checkAndDisplayResults(exampleData);
         });
 
@@ -329,7 +326,7 @@
     <h1 class="title">Objctify Me</h1>
 </div>
 <div class="row center-text">
-    <h4>Our Artificial Intelligence algorithms rate your attractiveness and then tweak the photo to make it better!</h4>
+    <h4>Our Artificial Intelligence algorithms rate your attractiveness and then tweak the photo to make it better!*</h4>
 </div>
 
 <div class="row" style="margin-top: 30px;">
@@ -362,12 +359,12 @@
     <label class="btn btn-primary btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-2 col-md-offset-1">
         Upload Your Own (Male)
         <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
-        <input id="imageselect_M" class="btn" type="file" accept="image/*" capture="camera" multiple style="display: none;">
+        <input id="imageselect_M" class="btn" type="file" accept="image/*" multiple style="display: none;">
     </label>
     <label class="btn btn-info btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-0 col-md-offset-2">
         Upload Your Own (Female)
         <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
-        <input id="imageselect_F" class="btn" type="file" accept="image/*" capture="camera" multiple style="display: none;">
+        <input id="imageselect_F" class="btn" type="file" accept="image/*" multiple style="display: none;">
     </label>
     <form id="uploadform" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
         <input type="hidden" name="type" value="1">
@@ -376,7 +373,7 @@
 </div>
 
 <div class="row" style="margin-top:40px;">
-    <p>Disclaimer: Objctify.Me is trained on data gathered from reddits r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results too seriously.
+    <p>*Disclaimer: Objctify.Me is trained on data gathered from reddits r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results too seriously.
         <br>
     Uploaded data may be stored in order to improve the algorithm, but will not be shared with others.</p>
 </div>
@@ -409,19 +406,21 @@
                 <h4 class="modal-title">Results:</h4>
             </div>
             <div class="modal-body">
-                <div class="row" style="text-align: center">
-                    <p>Our algorithms rate you:</p>
-                    <span id="rating" style="font-size: 50px; font-weight: bold;">1</span>
-                </div>
                 <div class="row">
-                    <div class="col-xs-12">
-                        <p>Below are our tweaked images (ctrl+hover over them to see the original):</p>
-                        <hr>
+                    <div class="col-xs-5">
+                        <p>Original:</p>
+                        <div id="originalImages" class="scrolls-y">
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div id="improvedImages" class="scrolls-x">
+                    <div class="col-xs-2">
+                        <div class="vcenter">
+                            <p>Our algorithms rate you:</p>
+                            <span id="rating" style="font-size: 50px; font-weight: bold;">1</span>
+                        </div>
+                    </div>
+                    <div class="col-xs-5">
+                        <p>Below are our tweaked images (ctrl+hover over them to see the original):</p>
+                        <div id="improvedImages" class="scrolls-y">
                         </div>
                     </div>
                 </div>
