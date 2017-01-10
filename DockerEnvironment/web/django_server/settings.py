@@ -118,10 +118,4 @@ STATIC_URL = '/static/'
 # print(STATICFILES_DIRS)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-TEMPLATE_LOADERS = (
-    'django.template.loaders.app_directories.Loader',
-    'django.template.loaders.filesystem.Loader',
-)
-TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
-
 MEDIA_ROOT = os.environ['MEDIA_ROOT']
