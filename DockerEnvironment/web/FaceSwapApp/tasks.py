@@ -52,7 +52,7 @@ def faceSwapTask(imageb64):
         return None
 
 @shared_task
-def faceBeautificationTask(uploadedIds):
+def faceBeautificationTask(uploadedIds, gender):
     try:
         reply = {}
         reply["images"] = []
@@ -60,7 +60,7 @@ def faceBeautificationTask(uploadedIds):
             uploadedImage = UploadedImage.objects.get(pk=id)
             image = upload_to_image(uploadedImage.image)
             image = ensureImageLessThanMax(image)
-            rating, improved = beautifyIm_Web(image)
+            rating, improved = beautifyIm_Web(image, gender)
             replyb64 = image_to_base64(improved)
 
             reply["images"].append({"name":uploadedImage.filename, "improved":replyb64, "rating":rating})

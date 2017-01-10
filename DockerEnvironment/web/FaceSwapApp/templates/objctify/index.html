@@ -136,18 +136,18 @@
                         },
                         success: function (data) {
                             if (data.status == "FAILURE") {
-                                displayErrorModal("error 500: "+data.reason);
+                                displayErrorModal(data.error);
                             } else {
                                 checkAndDisplayResults(data, retryCount + 1);
                             }
                         },
                         error: function (data) {
-                            displayErrorModal("error polling the faceswap server");
+                            displayErrorModal(data.statusText +"\n"+data.responseText.split("\n\n")[0]);
                         }
                     });
-                }, 500);
+                }, 500 * (retryCount+1));
             } else {
-                displayErrorModal("error retried too many times");
+                displayErrorModal("We were waiting too long, request timed out");
             }
         }
     }
@@ -156,11 +156,11 @@
         $("#resultswaiting").hide();
         $("#resultserror").show();
         $("#resultssucessful").hide();
-        $("#resultserrorbody").html(message);
+        $("#resultserrorreason").html(message);
     }
 
-    function uploadImages() {
-        if (resizedImages.length == $('#imageselect')[0].files.length) {
+    function uploadImages(imageselect) {
+        if (resizedImages.length == imageselect.files.length) {
             var data = new FormData($("#uploadform")[0]);
 
             for (var i=0; i<resizedImages.length; i++){
@@ -209,7 +209,7 @@
         return new Blob([uInt8Array], {type: contentType});
     }
 
-    function resizeImageFile(file) {
+    function resizeImageFile(file, imageselect) {
         // Load the image
         var reader = new FileReader();
         reader.onload = function (readerEvent) {
@@ -238,7 +238,7 @@
 
                 resizedImages.push({"filename":file.name, "dataUrl":dataUrl});
 
-                uploadImages();
+                uploadImages(imageselect);
             };
             image.src = readerEvent.target.result;
         };
@@ -269,15 +269,32 @@
 
     var resizedImages = [];
     $(function() {
-        $('#imageselect').change(function(event) {
+        $('#imageselect_F').change(function(event) {
             resizedImages = [];
+            $("#uploadform > input[name='gender']").val("F");
             //for each file
             for (var i = 0; i < event.target.files.length; i++) {
                 var file = event.target.files[i];
 
                 // Ensure it's an image
                 if (file.type.match(/image.*/)) {
-                    resizeImageFile(file);
+                    resizeImageFile(file, event.target);
+                } else {
+                    alert("The file you uploaded is not an image");
+                    return;
+                }
+            }
+        });
+        $('#imageselect_M').change(function(event) {
+            resizedImages = [];
+            $("#uploadform > input[name='gender']").val("M");
+            //for each file
+            for (var i = 0; i < event.target.files.length; i++) {
+                var file = event.target.files[i];
+
+                // Ensure it's an image
+                if (file.type.match(/image.*/)) {
+                    resizeImageFile(file, event.target);
                 } else {
                     alert("The file you uploaded is not an image");
                     return;
@@ -396,8 +413,10 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Error:</h4>
             </div>
-            <div class="modal-body" id="resultserrorbody">
-                <p>There has been an error</p>
+            <div class="modal-body">
+                <h2>Sorry!</h2>
+                <p>There has been an error processing the image you uploaded:</p>
+                <p id="resultserrorreason">No Reason Given</p>
             </div>
         </div>
         <div id="resultssucessful" class="modal-content" style="display:none;">

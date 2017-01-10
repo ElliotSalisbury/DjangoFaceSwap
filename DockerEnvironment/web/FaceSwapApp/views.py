@@ -24,12 +24,6 @@ def save_upload_request(request, type, images, task):
 
     return ipr, uis
 
-def startProcessingTask(task, UIids, request=None):
-    result = task.apply_async((UIids,), expires=60 * 3)
-    if request:
-        request.session["taskId"] = result.task_id
-    return result
-
 def index(request):
     return render_to_response('objctify/index.html')
 def about(request):
@@ -38,12 +32,14 @@ def about(request):
 def upload(request):
     if request.method == 'POST':
         type = request.POST.get("type", FACE_SWAP)
+        gender = request.POST.get("gender", "F")
         images = request.FILES.getlist('images')
 
         IPR, UIs = save_upload_request(request, type, images, TASKS[type])
         UIids = [ui.id for ui in UIs]
 
-        result = startProcessingTask(TASKS[type], UIids, request)
+        result = TASKS[type].apply_async((UIids, gender), expires=60 * 3)
+        request.session["taskId"] = result.task_id
 
         reply = {"type": type, "taskId":result.task_id,}# "result":result}
 
@@ -78,14 +74,16 @@ def getSwap(request):
         result = TASKS[type].AsyncResult(taskId)
         reply["status"] = result.status
 
-        #if the task has finished
-        if reply["status"] == "SUCCESS":
+        if result.status == "FAILURE":
+            reply["error"] = str(result.result)
+        elif result.status == "SUCCESS":
             #get the results
             reply["result"] = result.get()
             #if no image has been returned (probably no faces)
             if reply["result"] is None:
                 #return the task as failed, so that JS stops polling
                 reply["status"] = "FAILURE"
+                reply["error"] = "No image was returned from the processing task."
         return HttpResponse(json.dumps(reply), content_type="application/json")
 
     return HttpResponseServerError("No TaskId")
