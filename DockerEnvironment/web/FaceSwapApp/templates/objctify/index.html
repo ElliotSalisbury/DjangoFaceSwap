@@ -18,15 +18,10 @@
         height:100%;
     }
 
-    .btn-center {
-        margin: auto;
-        width: 20%;
-        display: block;
-    }
-
     #example_carousel {
         position: relative;
         height: 200px;
+        margin-bottom: 40px;
     }
     #example_carousel ul{
         position: relative;
@@ -334,10 +329,10 @@
     <h1 class="title">Objctify Me</h1>
 </div>
 <div class="row center-text">
-    <h2>Our Artificial Intelligence algorithms rate your attractiveness and then tweak the photo to make it better!</h2>
+    <h4>Our Artificial Intelligence algorithms rate your attractiveness and then tweak the photo to make it better!</h4>
 </div>
 
-<div class="row">
+<div class="row" style="margin-top: 30px;">
     <p>Try our examples or upload your own below:</p>
     <div id="example_carousel">
         <ul>
@@ -353,30 +348,37 @@
     </div>
 </div>
 <div class="row">
-    <label id="examplebtn" class="btn btn-primary col-xs-12 col-sm-6 col-md-4 col-sm-offset-3 col-md-offset-4">
+    <label id="examplebtn" class="btn btn-default col-xs-12 col-sm-6 col-md-4 col-sm-offset-3 col-md-offset-4">
         Use this photo
         <span class="glyphicon glyphicon-arrow-up" aria-hidden="true" style="margin-left: 6px;"></span>
     </label>
 </div>
 
 <div class="row center-text" style="margin:20px;">
-    Or
+    <h5>Or</h5>
 </div>
 
 <div class="row">
-    <label class="btn btn-info btn-file col-xs-12 col-sm-6 col-md-4 col-sm-offset-3 col-md-offset-4">
-        Upload Your Own
+    <label class="btn btn-primary btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-2 col-md-offset-1">
+        Upload Your Own (Male)
         <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
-        <input id="imageselect" class="btn" type="file" accept="image/*" capture="camera" multiple style="display: none;">
+        <input id="imageselect_M" class="btn" type="file" accept="image/*" capture="camera" multiple style="display: none;">
+    </label>
+    <label class="btn btn-info btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-0 col-md-offset-2">
+        Upload Your Own (Female)
+        <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
+        <input id="imageselect_F" class="btn" type="file" accept="image/*" capture="camera" multiple style="display: none;">
     </label>
     <form id="uploadform" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
         <input type="hidden" name="type" value="1">
+        <input type="hidden" name="gender" value="F">
     </form>
 </div>
 
-<div class="row">
-    <p>Disclaimer: Objctify.Me is trained on data gathered from reddits r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results too seriously.</p>
-    <p>Uploaded data may be stored in order to improve the algorithm, but will not be shared with others</p>
+<div class="row" style="margin-top:40px;">
+    <p>Disclaimer: Objctify.Me is trained on data gathered from reddits r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results too seriously.
+        <br>
+    Uploaded data may be stored in order to improve the algorithm, but will not be shared with others.</p>
 </div>
 {% endblock %}
 
