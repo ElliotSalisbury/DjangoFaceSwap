@@ -1,31 +1,29 @@
 import numpy as np
 import sys
 
-from US10k.US10k import loadUS10kFacialFeatures, loadUS10kPCAGP
+from US10k.US10k import loadUS10k
+from RateMe.RateMe import loadRateMe
 from Beautifier.beautifier import beautifyIm, rateFace
+from Beautifier.face3D.beautifier3D import beautifyIm3D, rateFace3D
 
-us10kdf = loadUS10kFacialFeatures()
+US10k_2D_F = loadUS10k(type="2d", gender="F")
+US10k_2D_M = loadUS10k(type="2d", gender="M")
 
-us10k_F = us10kdf.loc[us10kdf['gender'] == 'F']
-us10k_M = us10kdf.loc[us10kdf['gender'] == 'M']
+# US10k_3D_F = loadUS10k(type="3d", gender="F")
+# US10k_3D_M = loadUS10k(type="3d", gender="M")
 
-trainX_F = np.array(us10k_F["facefeatures"].as_matrix().tolist())
-trainY_F = np.array(us10k_F["attractiveness"].as_matrix().tolist())
-trainX_M = np.array(us10k_M["facefeatures"].as_matrix().tolist())
-trainY_M = np.array(us10k_M["attractiveness"].as_matrix().tolist())
+RateMe_2D_F = loadRateMe(type="2d", gender="F")
+RateMe_2D_M = loadRateMe(type="2d", gender="M")
 
-#load the GP that learnt attractiveness
-us10kpca_F, us10kgp_F = loadUS10kPCAGP(type="2d", gender="F")
-us10kpca_M, us10kgp_M = loadUS10kPCAGP(type="2d", gender="M")
+# RateMe_3D_F = loadRateMe(type="3d", gender="F")
+# RateMe_3D_M = loadRateMe(type="3d", gender="M")
 
 def beautifyIm_Web(im, gender):
     if gender == "F":
-        trainX, trainY = trainX_F, trainY_F
-        pca, gp = us10kpca_F, us10kgp_F
+        trainX, trainY, pca, gp = RateMe_2D_F
     elif gender == "M":
-        trainX, trainY = trainX_M, trainY_M
-        pca, gp = us10kpca_M, us10kgp_M
+        trainX, trainY, pca, gp = RateMe_2D_M
 
-    rating = rateFace(im, pca, gp) * 2
+    rating = rateFace(im, pca, gp)
     image = beautifyIm(im, pca, gp, trainX, trainY, method='KNN')
     return rating, image
