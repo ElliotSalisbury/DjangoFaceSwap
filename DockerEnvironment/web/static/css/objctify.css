@@ -26,3 +26,13 @@ h4 {
     font-family: 'Pacifico', cursive;
     margin: 30px;
 }
+
+.textwrap {
+    white-space: normal;
+}
+
+@media (max-width: 767px) {
+  .hidden-xs-down {
+    display: none !important;
+  }
+}

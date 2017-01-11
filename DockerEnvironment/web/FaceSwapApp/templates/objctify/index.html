@@ -20,6 +20,7 @@
         height: 200px;
         margin-bottom: 40px;
         border: 1px solid rgb(240,240,240);
+        overflow: hidden;
     }
     #example_carousel ul{
         position: relative;
@@ -349,12 +350,12 @@
 </div>
 
 <div class="row">
-    <label class="btn btn-primary btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-2 col-md-offset-1">
+    <label class="btn btn-primary btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-2 col-md-offset-1 textwrap">
         Upload Your Own (Male)
         <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
         <input id="imageselect_M" class="btn" type="file" accept="image/*" multiple style="display: none;">
     </label>
-    <label class="btn btn-info btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-0 col-md-offset-2">
+    <label class="btn btn-info btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-0 col-md-offset-2 textwrap">
         Upload Your Own (Female)
         <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
         <input id="imageselect_F" class="btn" type="file" accept="image/*" multiple style="display: none;">
@@ -402,19 +403,19 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-xs-5">
+                    <div class="col-sm-5 hidden-xs-down">
                         <p>Original:</p>
                         <div id="originalImages" class="scrolls-y">
                         </div>
                     </div>
-                    <div class="col-xs-2">
+                    <div class="col-xs-12 col-sm-2">
                         <div class="vcenter">
                             <p>Our algorithms rate you:</p>
                             <span id="rating" style="font-size: 50px; font-weight: bold;">1</span>
                         </div>
                     </div>
-                    <div class="col-xs-5">
-                        <p>Below are our tweaked images (ctrl+hover over them to see the original):</p>
+                    <div class="col-xs-12 col-sm-5">
+                        <p>Below are our tweaked images.<br>(ctrl+hover over them to see the original)</p>
                         <div id="improvedImages" class="scrolls-y">
                         </div>
                     </div>
