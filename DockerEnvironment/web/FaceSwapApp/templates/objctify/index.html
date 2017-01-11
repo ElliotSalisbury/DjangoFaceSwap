@@ -184,6 +184,9 @@
                     alert("There was an error uploading images");
                 }
             });
+
+            //clear imageselect
+            imageselect.value = "";
         }
     }
 
@@ -243,7 +246,7 @@
                 loadImage(
                     file,
                     function (canvas) {
-                        var dataUrl = canvas.toDataURL('image/webp');
+                        var dataUrl = canvas.toDataURL('image/jpeg');
 
                         resizedImages.push({"filename":file.name, "dataUrl":dataUrl});
 

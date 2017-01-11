@@ -36,8 +36,8 @@ def ensureImageLessThanMax(im, maxsize=512):
     return im
 
 def image_to_base64(image):
-    jpgdata = cv2.imencode('.webp',image)[1]
-    b64 = "data:image/webp;base64,"+base64.b64encode(jpgdata).decode('utf-8')
+    jpgdata = cv2.imencode('.jpg',image)[1]
+    b64 = "data:image/jpeg;base64,"+base64.b64encode(jpgdata).decode('utf-8')
     return b64
 
 @shared_task
