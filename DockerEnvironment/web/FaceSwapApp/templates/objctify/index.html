@@ -5,7 +5,6 @@
 {% block head_block %}
     <script type="text/javascript" src="{% static 'js/exif.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/load-image.all.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/jquery.fittext.js' %}"></script>
 <style>
     body {
         overflow-x: hidden;
@@ -416,10 +415,12 @@
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-2">
-                        <div class="vcenter">
-                            <p>Our algorithms rate you:</p>
-                            <span id="rating" style="font-size: 50px; font-weight: bold;">1</span>
-                        </div>
+                        <p>Our algorithms rate you:</p>
+                        <span class="glyphicon glyphicon-arrow-left hidden-xs-down" aria-hidden="true"></span>
+                        <span id="rating" style="font-size: 50px; font-weight: bold;">1</span>
+
+                        <p>Here are our tweaked images.<br>(ctrl+hover over them to see the original)</p>
+                        <span class="glyphicon glyphicon-arrow-right hidden-xs-down" aria-hidden="true"></span>
                     </div>
                     <div class="col-xs-12 col-sm-5">
                         <div id="improvedImages" class="scrolls-y">
