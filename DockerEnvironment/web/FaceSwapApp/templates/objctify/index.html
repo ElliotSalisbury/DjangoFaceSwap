@@ -5,6 +5,7 @@
 {% block head_block %}
     <script type="text/javascript" src="{% static 'js/exif.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/load-image.all.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.fittext.js' %}"></script>
 <style>
     body {
         overflow-x: hidden;
@@ -124,9 +125,7 @@
             $("#resultserror").hide();
             $("#resultssucessful").show();
         }else {
-            $("#resultswaiting").show();
-            $("#resultserror").hide();
-            $("#resultssucessful").hide();
+            displayWaitingModal();
             if (retryCount < 10) {
                 setTimeout(function () {
                     $.ajax({
@@ -155,7 +154,15 @@
         }
     }
 
+    function displayWaitingModal(message) {
+        $("#resultsmodal").modal("show");
+        $("#resultswaiting").show();
+        $("#resultserror").hide();
+        $("#resultssucessful").hide();
+        $("#resultserrorreason").html(message);
+    }
     function displayErrorModal(message) {
+        $("#resultsmodal").modal("show");
         $("#resultswaiting").hide();
         $("#resultserror").show();
         $("#resultssucessful").hide();
@@ -171,6 +178,7 @@
                 data.append("images", resizedImage);
             }
 
+            displayWaitingModal();
             $.ajax({
                 url: "{% url 'upload' %}",
                 data: data,
@@ -404,7 +412,6 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-sm-5 hidden-xs-down">
-                        <p>Original:</p>
                         <div id="originalImages" class="scrolls-y">
                         </div>
                     </div>
@@ -415,7 +422,6 @@
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-5">
-                        <p>Below are our tweaked images.<br>(ctrl+hover over them to see the original)</p>
                         <div id="improvedImages" class="scrolls-y">
                         </div>
                     </div>
