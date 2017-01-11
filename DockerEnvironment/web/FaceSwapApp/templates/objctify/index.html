@@ -3,6 +3,10 @@
 
 
 {% block head_block %}
+    <script type="text/javascript" src="{% static 'js/exif.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/load-image.all.min.js' %}"></script>
+);
+
 <style>
     body {
         overflow-x: hidden;
@@ -159,7 +163,7 @@
         $("#resultserrorreason").html(message);
     }
 
-    function uploadImages(imageselect) {
+    function waitThenSubmitImages(imageselect) {
         if (resizedImages.length == imageselect.files.length) {
             var data = new FormData($("#uploadform")[0]);
 
@@ -209,42 +213,6 @@
         return new Blob([uInt8Array], {type: contentType});
     }
 
-    function resizeImageFile(file, imageselect) {
-        // Load the image
-        var reader = new FileReader();
-        reader.onload = function (readerEvent) {
-            var image = new Image();
-            image.onload = function (imageEvent) {
-                // Resize the image
-                var canvas = document.createElement('canvas'),
-                        max_size = 512,
-                        width = image.width,
-                        height = image.height;
-                if (width > height) {
-                    if (width > max_size) {
-                        height *= max_size / width;
-                        width = max_size;
-                    }
-                } else {
-                    if (height > max_size) {
-                        width *= max_size / height;
-                        height = max_size;
-                    }
-                }
-                canvas.width = width;
-                canvas.height = height;
-                canvas.getContext('2d').drawImage(image, 0, 0, width, height);
-                var dataUrl = canvas.toDataURL('image/webp');
-
-                resizedImages.push({"filename":file.name, "dataUrl":dataUrl});
-
-                uploadImages(imageselect);
-            };
-            image.src = readerEvent.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
     function slideToNextActive(direction) {
         var currentActive = $("#example_carousel > ul > li.active");
         if (direction > 0) {
@@ -267,39 +235,46 @@
         $("#example_carousel > ul").css("left",newMidPoint);
     }
 
+    function correctImagesAndUpload(imageselect) {
+        for (var i = 0; i < imageselect.files.length; i++) {
+            var file = imageselect.files[i];
+
+            // Ensure it's an image
+            if (file.type.match(/image.*/)) {
+                //ensure image is correct orientation and max size
+                loadImage(
+                    file,
+                    function (canvas) {
+                        var dataUrl = canvas.toDataURL('image/webp');
+
+                        resizedImages.push({"filename":file.name, "dataUrl":dataUrl});
+
+                        waitThenSubmitImages(imageselect);
+                    },
+                    {
+                        maxWidth: 512,
+                        maxHeight: 512,
+                        orientation: true,
+                        canvas: true
+                    });
+            } else {
+                displayErrorModal("The file you uploaded is not an image");
+                return;
+            }
+        }
+    }
+
     var resizedImages = [];
     $(function() {
         $('#imageselect_F').change(function(event) {
             resizedImages = [];
             $("#uploadform > input[name='gender']").val("F");
-            //for each file
-            for (var i = 0; i < event.target.files.length; i++) {
-                var file = event.target.files[i];
-
-                // Ensure it's an image
-                if (file.type.match(/image.*/)) {
-                    resizeImageFile(file, event.target);
-                } else {
-                    alert("The file you uploaded is not an image");
-                    return;
-                }
-            }
+            correctImagesAndUpload(event.target);
         });
         $('#imageselect_M').change(function(event) {
             resizedImages = [];
             $("#uploadform > input[name='gender']").val("M");
-            //for each file
-            for (var i = 0; i < event.target.files.length; i++) {
-                var file = event.target.files[i];
-
-                // Ensure it's an image
-                if (file.type.match(/image.*/)) {
-                    resizeImageFile(file, event.target);
-                } else {
-                    alert("The file you uploaded is not an image");
-                    return;
-                }
-            }
+            correctImagesAndUpload(event.target);
         });
 
         $("#examplebtn").click(function(event) {
