@@ -60,10 +60,11 @@ def faceBeautificationTask(uploadedIds, gender):
             uploadedImage = UploadedImage.objects.get(pk=id)
             image = upload_to_image(uploadedImage.image)
             image = ensureImageLessThanMax(image)
-            rating, improved = beautifyIm_Web(image, gender)
+            rating, improved, improvedF = beautifyIm_Web(image, gender)
             replyb64 = image_to_base64(improved)
+            replyb64F = image_to_base64(improvedF)
 
-            reply["images"].append({"name":uploadedImage.filename, "improved":replyb64, "rating":rating})
+            reply["images"].append({"name":uploadedImage.filename, "improved":replyb64, "improvedF":replyb64F, "rating":rating})
         return reply
     except NoFaces as noFacesError:
         return None

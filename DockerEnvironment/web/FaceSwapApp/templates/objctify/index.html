@@ -88,25 +88,21 @@
 
                 //create the improved image, and convert to jpg for saving
                 //create a download link
-                var filename = data.result.images[i].name.split(".")[0];
-                var link = $("<a download='"+filename+".jpg'></a>");
                 var image = new Image();
-                image.onload = function () {
-                    var canvas = document.createElement('canvas');
-                    canvas.width = this.naturalWidth; // or 'width' if you want a special/scaled size
-                    canvas.height = this.naturalHeight; // or 'height' if you want a special/scaled size
-
-                    canvas.getContext('2d').drawImage(this, 0, 0);
-
-                    link.attr("href", canvas.toDataURL('image/jpeg'));
-                };
                 image.src = data.result.images[i].improved;
                 $(image).attr("improved", data.result.images[i].improved);
                 $(image).attr("orig", resizedImages[i].dataUrl);
                 $(image).addClass("hoverImpToOrig img-responsive");
 
-                link.append(image);
-                link.appendTo('#improvedImages');
+                $('#improvedImages').append(image);
+
+                image = new Image();
+                image.src = data.result.images[i].improvedF;
+                $(image).attr("improved", data.result.images[i].improvedF);
+                $(image).attr("orig", resizedImages[i].dataUrl);
+                $(image).addClass("hoverImpToOrig img-responsive");
+
+                $('#improvedImages').append(image);
             }
 
             //set the rating
