@@ -13,11 +13,72 @@
 <div class="row center-text">
     <h1 class="title">Beauty Is Dataful</h1>
 </div>
-
 <p>
-    scraped <a href="www.reddit.com/r/RateMe">r/RateMe</a> downloading N submissions and X number of images.
-    Calculating the average rating out of 10, discarding any submission with less than 3 ratings</p>
-<p>
-
+    Beauty is in the eye of the beholder, or so they say.
+    I don't agree with this, my theory is there's some underlying characteristics of peoples faces that are more attractive than others, and in this experiment, I set out to discover what those are.
+    We begin by looking at <a href="http://www.reddit.com/r/RateMe">r/RateMe</a>, a subreddit where users can submit pictures of themselves and commenters will provide constructive criticism.
 </p>
+
+<p>
+    Looking at a typical submission, I can see that a lot of commenters rate the subject on the out-of-ten scale, 1 being very unattractive, 10 being very attractive.
+    Taking the average of these ratings could be a useful gauge of a users attractiveness.
+    Thus, the first step to identifying attractiveness was to scrape all the submissions off r/RateMe, filtering out submissions where there was less than 3 comments that rate the subject.
+    Leaving us with 3,342 submissions, 1798 from women, and 1544 from men.
+</p>
+
+<p>
+    We generate a histogram of commenter ratings.
+</p>
+    <img src="{% static 'img/beautyisdataful/Female Ratings.png' %}">
+    <img src="{% static 'img/beautyisdataful/Male Ratings.png' %}">
+    <img src="{% static 'img/beautyisdataful/Female Attractiveness.png' %}">
+    <img src="{% static 'img/beautyisdataful/Male Attractiveness.png' %}">
+
+<p>
+    If the out-of-ten rating scale was linear, then an average person should score a 5.
+    Instead, we see in this data that the bell curve is centered around 7.5 ish, half way between 5 and 10.
+    Either reddit users are all above average, or rating a user below a 5 feels mean.
+
+    That's not too surprising, but instead look at the number of ratings these submissions got, Women are far more likely to get rated out-of-10 than the men.
+</p>
+    <img src="{% static 'img/beautyisdataful/Female Submissions Number of Ratings.png' %}">
+    <img src="{% static 'img/beautyisdataful/Male Submissions Number of Ratings.png' %}">
+<p>
+    TODO, compare against count of comments, maybe women get more comments, or maybe people dont rank men
+
+    I noticed some of the comments left were <a href="https://www.reddit.com/r/Rateme/comments/23eisl/18f_please_be_honest/ch2jszi/">incredibly mean</a>,
+    so in an attempt to filter out trolling I removed outlier ratings.
+    Any rating that was further than 2 standard deviations from the median was considered an outlier.
+
+    Lets sort these submissions by their average ratings and plot with their standard deviation.
+</p>
+    <img src="{% static 'img/beautyisdataful/Female Submissions Sorted by Average Rating.png' %}">
+    <img src="{% static 'img/beautyisdataful/Male Submissions Sorted by Average Rating.png' %}">
+
+<p>
+    Okay, so what we're interested in here, is what features do the attractive people have, that the less attractive people don't have.
+    For that we need to use computer vision to analyse the images submitted by the users.
+    I use a <a href="http://dlib.net/">facial landmark detector</a>, and a <a href="https://github.com/patrikhuber/eos">3D face mesh fitting library</a>.
+    The landmark detector, looks for faces in images, and identifies the location of the common features (e.g., eyes, nose, mouth), see below.
+</p>
+    <img src="{% static 'img/beautyisdataful/Landmark Detection.png' %}">
+<p>
+    The 3D face fitting uses work from researchers at the University of Surrey.
+    From hundreds of 3D scanned faces they calculate a set of principle components that describe how faces vary from person to person.
+    Using the sliders below, you can play with these components to see how the face varies (Requires WebGL compatible browser).
+    The library finds a face shape, orientation and position that best align with the landmarks detected above.
+</p>
+    <img src="{% static 'img/beautyisdataful/Face Mesh Fitted.png' %}">
+<p>
+    Now we can calculate the 3D face shape of our r/RateMe users, and attempt to find features (or rather, components) that are more common amongst attractive users.
+    Below we show the average faces generated from our users.
+</p>
+
+<p>
+    And here we show the same data, morphing from least to most attractive
+</p>
+
+
+
+
 {% endblock %}
