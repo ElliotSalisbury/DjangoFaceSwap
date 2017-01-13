@@ -92,7 +92,8 @@
                 image.src = data.result.images[i].improved;
                 $(image).attr("improved", data.result.images[i].improved);
                 $(image).attr("orig", resizedImages[i].dataUrl);
-                $(image).addClass("hoverImpToOrig img-responsive");
+                $(image).addClass("hoverImpToOrig col-xs-12 col-sm-6");
+                $(image).css("padding",1);
 
                 $('#improvedImages').append(image);
 
@@ -100,7 +101,8 @@
                 image.src = data.result.images[i].improvedF;
                 $(image).attr("improved", data.result.images[i].improvedF);
                 $(image).attr("orig", resizedImages[i].dataUrl);
-                $(image).addClass("hoverImpToOrig img-responsive");
+                $(image).addClass("hoverImpToOrig col-xs-12 col-sm-6");
+                $(image).css("padding",1);
 
                 $('#improvedImages').append(image);
             }
@@ -406,7 +408,7 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-sm-5 hidden-xs-down">
+                    <div class="col-sm-3 hidden-xs-down">
                         <div id="originalImages" class="scrolls-y">
                         </div>
                     </div>
@@ -418,7 +420,7 @@
                         <p>Here are our tweaked images.<br>(ctrl+hover over them to see the original)</p>
                         <span class="glyphicon glyphicon-arrow-right hidden-xs-down" aria-hidden="true"></span>
                     </div>
-                    <div class="col-xs-12 col-sm-5">
+                    <div class="col-xs-12 col-sm-7">
                         <div id="improvedImages" class="scrolls-y">
                         </div>
                     </div>
