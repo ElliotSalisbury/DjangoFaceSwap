@@ -20,14 +20,18 @@
 		</style>
         <script src="http://threejs.org/build/three.min.js"></script>
 		<script src="{% static 'averagefaces/js/controls/OrbitControls.js' %}"></script>
-        <script src="'averagefaces/js//dat.gui.js"></script>
         <script id="vertex_shh" type="x-shader/x-vertex">
+            #include <morphtarget_pars_vertex>
+
 			varying vec2 vUv;
 
 			void main()
 			{
+			    #include <begin_vertex>
+			    #include <morphtarget_vertex>
+
 				vUv = uv;
-				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+				vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );
 				gl_Position = projectionMatrix * mvPosition;
 			}
 		</script>
@@ -58,11 +62,11 @@
 			var fragShader = document.getElementById('fragment_shh').innerHTML;
 
 			var FACENAMES = [
-				"{% static 'averagefaces/averageFaces_F_1.46_30' %}",
-                "{% static 'averagefaces/averageFaces_F_2.21_182' %}",
-                "{% static 'averagefaces/averageFaces_F_2.96_311' %}",
-                "{% static 'averagefaces/averageFaces_F_3.71_298' %}",
-                "{% static 'averagefaces/averageFaces_F_4.46_115' %}",
+				"{% static 'averagefaces/averageFaces_F_0' %}",
+                "{% static 'averagefaces/averageFaces_F_1' %}",
+                "{% static 'averagefaces/averageFaces_F_2' %}",
+                "{% static 'averagefaces/averageFaces_F_3' %}",
+                "{% static 'averagefaces/averageFaces_F_4' %}",
 			];
 			var geometrys = [];
 
