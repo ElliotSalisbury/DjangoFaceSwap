@@ -29,6 +29,9 @@ def index(request):
 def about(request):
     return render_to_response('objctify/about.html')
 
+def averageFaces(request):
+    return render_to_response('objctify/3D/averageFaces.html')
+
 def upload(request):
     if request.method == 'POST':
         type = request.POST.get("type", FACE_SWAP)
