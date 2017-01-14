@@ -1,0 +1,198 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Morph Faces</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+        <script src="http://threejs.org/build/three.min.js"></script>
+		<script src="{% static 'averagefaces/js/controls/OrbitControls.js' %}"></script>
+        <script src="'averagefaces/js//dat.gui.js"></script>
+        <script id="vertex_shh" type="x-shader/x-vertex">
+			varying vec2 vUv;
+
+			void main()
+			{
+				vUv = uv;
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+				gl_Position = projectionMatrix * mvPosition;
+			}
+		</script>
+		<script id="fragment_shh" type="x-shader/x-fragment">
+			#ifdef GL_ES
+			precision highp float;
+			#endif
+
+			uniform sampler2D faces[5];
+			uniform float alphas[5];
+
+			varying vec2 vUv;
+
+			void main(void)
+			{
+				vec3 c;
+				for(int i = 0; i < 5; i++) {
+					vec4 C = texture2D(faces[i], vUv);
+					c += C.rgb * alphas[i];
+				}
+			    gl_FragColor= vec4(c, 1.0);
+			}
+		</script>
+        <script>
+			var camera, controls, scene, renderer;
+			var face, mixer;
+			var vertShader = document.getElementById('vertex_shh').innerHTML;
+			var fragShader = document.getElementById('fragment_shh').innerHTML;
+
+			var FACENAMES = [
+				"{% static 'averagefaces/averageFaces_F_1.46_30' %}",
+                "{% static 'averagefaces/averageFaces_F_2.21_182' %}",
+                "{% static 'averagefaces/averageFaces_F_2.96_311' %}",
+                "{% static 'averagefaces/averageFaces_F_3.71_298' %}",
+                "{% static 'averagefaces/averageFaces_F_4.46_115' %}",
+			];
+			var geometrys = [];
+
+			var textureArray = [];
+			for (var i in FACENAMES) {
+				var FACENAME = FACENAMES[i];
+				textureArray.push(THREE.ImageUtils.loadTexture(FACENAME + ".jpg"))
+			}
+
+			var uniforms = {    // custom uniforms (your textures)
+				faces: { type: "tv", value: textureArray },
+				alphas : {type: "fv1", value: [1,0,0,0,0]}
+			};
+
+			var material_shh = new THREE.ShaderMaterial({
+				uniforms: uniforms,
+				vertexShader: vertShader,
+				fragmentShader: fragShader,
+				morphTargets: true
+			});
+
+			function loadmesh(FACENAME, i){
+				return function ( geometry ) {
+					console.log(""+i+" "+FACENAME);
+
+					geometrys[FACENAME] = geometry;
+
+					geometryLoaded();
+				}
+			}
+
+			function arrayContainsArray(a1, a2) {
+				for (ai in a2) {
+					ae = a2[ai];
+					if (!(ae in a1)) {
+						return false;
+					}
+				}
+				return true;
+			}
+
+			function geometryLoaded() {
+				//only run when all geometry is loaded
+				if (arrayContainsArray(geometrys, FACENAMES)) {
+					var faceGeometry = geometrys[FACENAMES[0]];
+
+					var i = 0;
+					for (var key in geometrys) {
+						faceGeometry.morphTargets[i] = {name: key, vertices: geometrys[key].vertices};
+						i++;
+					}
+					faceGeometry.computeMorphNormals();
+
+					face = new THREE.Mesh( faceGeometry, material_shh );
+					scene.add( face );
+
+					mixer = new THREE.AnimationMixer( face );
+					var clip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'gallop', faceGeometry.morphTargets, 30 );
+					mixer.clipAction( clip ).setDuration( 5 ).play();
+				}
+			}
+
+			function init() {
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0x444444 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				var container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 200;
+				camera.position.x = 100;
+
+				light = new THREE.AmbientLight( 0xcccccc );
+				scene.add( light );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.25;
+				controls.enableZoom = true;
+
+				for (var i in FACENAMES) {
+					var FACENAME = FACENAMES[i];
+
+					var loader = new THREE.JSONLoader();
+					loader.load( FACENAME+'.json', loadmesh(FACENAME,i));
+				}
+
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+			function animate() {
+				requestAnimationFrame( animate );
+
+				controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
+
+				render();
+			}
+
+			var prevTime = Date.now();
+			function render() {
+				if ( mixer ) {
+					var time = Date.now();
+					mixer.update( ( time - prevTime ) * 0.001 );
+					prevTime = time;
+
+					uniforms.alphas.value = face.morphTargetInfluences;
+				}
+				renderer.render( scene, camera );
+			}
+
+            function onLoad() {
+                init();
+			    animate();
+            }
+		</script>
+	</head>
+
+	<body onload="onLoad();">
+		<div id="container"></div>
+	</body>
+</html>

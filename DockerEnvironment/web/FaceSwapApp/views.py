@@ -31,6 +31,8 @@ def about(request):
 
 def averageFaces(request):
     return render_to_response('objctify/3D/averageFaces.html')
+def morphFaces(request):
+    return render_to_response('objctify/3D/morphFaces.html')
 
 def upload(request):
     if request.method == 'POST':
