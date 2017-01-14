@@ -1,6 +1,3 @@
-import numpy as np
-import sys
-
 from US10k.US10k import loadUS10k
 from RateMe.RateMe import loadRateMe
 from Beautifier.beautifier import beautifyIm, rateFace
