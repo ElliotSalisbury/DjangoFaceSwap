@@ -61,14 +61,14 @@
     I use a <a href="http://dlib.net/">facial landmark detector</a>, and a <a href="https://github.com/patrikhuber/eos">3D face mesh fitting library</a>.
     The landmark detector, looks for faces in images, and identifies the location of the common features (e.g., eyes, nose, mouth), see below.
 </p>
-    <img src="{% static 'img/beautyisdataful/Landmark Detection.png' %}">
+    <img src="{% static 'img/beautyisdataful/Landmarks.jpg' %}">
 <p>
     The 3D face fitting uses work from researchers at the University of Surrey.
     From hundreds of 3D scanned faces they calculate a set of principle components that describe how faces vary from person to person.
     Using the sliders below, you can play with these components to see how the face varies (Requires WebGL compatible browser).
     The library finds a face shape, orientation and position that best align with the landmarks detected above.
 </p>
-    <img src="{% static 'img/beautyisdataful/Face Mesh Fitted.png' %}">
+    <img src="{% static 'img/beautyisdataful/Mesh.jpg' %}">
 <p>
     Now we can calculate the 3D face shape of our r/RateMe users, and attempt to find features (or rather, components) that are more common amongst attractive users.
     Below we show the average faces generated from our users.
