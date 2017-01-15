@@ -3,8 +3,41 @@
 
 
 {% block head_block %}
-    <script type="text/javascript" src="{% static 'js/exif.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/load-image.all.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/ua-parser.min.js' %}"></script>
+    <script>
+        if (!String.prototype.includes) {
+             String.prototype.includes = function() {
+                 'use strict';
+                 return String.prototype.indexOf.apply(this, arguments) !== -1;
+             };
+         }
+
+        var parser = new UAParser();
+        var browser = parser.getBrowser();
+
+        //include the safari canvas resizing code
+        if (browser.name.includes("Safari")) {
+            var exif = document.createElement('script');
+            exif.setAttribute('src',"{% static 'js/exif.ios.js' %}");
+            document.head.appendChild(exif);
+
+            var binaryajax = document.createElement('script');
+            binaryajax.setAttribute('src',"{% static 'js/binaryajax.js' %}");
+            document.head.appendChild(binaryajax);
+
+            var canvasresize = document.createElement('script');
+            canvasresize.setAttribute('src',"{% static 'js/canvasResize.js' %}");
+            document.head.appendChild(canvasresize);
+        }else{
+            var exif = document.createElement('script');
+            exif.setAttribute('src',"{% static 'js/exif.min.js' %}");
+            document.head.appendChild(exif);
+
+            var loadimage = document.createElement('script');
+            loadimage.setAttribute('src',"{% static 'js/load-image.all.min.js' %}");
+            document.head.appendChild(loadimage);
+        }
+    </script>
 <style>
     body {
         overflow-x: hidden;
@@ -171,10 +204,13 @@
             var data = new FormData($("#uploadform")[0]);
 
             for (var i=0; i<resizedImages.length; i++){
-                var resizedImage = new File([dataURLToBlob(resizedImages[i].dataUrl)], resizedImages[i].filename);
-                data.append("images", resizedImage);
+                if (browser.name.includes("Edge") || browser.name.includes("IE")) {
+                    data.append("images", dataURLToBlob(resizedImages[i].dataUrl));
+                } else {
+                    var resizedImage = new File([dataURLToBlob(resizedImages[i].dataUrl)], resizedImages[i].filename);
+                    data.append("images", resizedImage);
+                }
             }
-
             displayWaitingModal();
             $.ajax({
                 url: "{% url 'upload' %}",
@@ -248,22 +284,38 @@
 
             // Ensure it's an image
             if (file.type.match(/image.*/)) {
-                //ensure image is correct orientation and max size
-                loadImage(
-                    file,
-                    function (canvas) {
-                        var dataUrl = canvas.toDataURL('image/jpeg');
 
-                        resizedImages.push({"filename":file.name, "dataUrl":dataUrl});
-
-                        waitThenSubmitImages(imageselect);
-                    },
-                    {
-                        maxWidth: 512,
-                        maxHeight: 512,
-                        orientation: true,
-                        canvas: true
+                //ensure image is correct orientation and max size, handling safaris weird behavior
+                if (browser.name.includes("Safari")) {
+                    canvasResize(file, {
+                        width: 512,
+                        height: 0,
+                        crop: false,
+                        quality: 80,
+                        callback: function(data, width, height) {
+                            resizedImages.push({"filename":file.name, "dataUrl":data});
+                            waitThenSubmitImages(imageselect);
+                        }
                     });
+
+                } else {
+                    loadImage(
+                        file,
+                        function (canvas) {
+                            var dataUrl = canvas.toDataURL('image/jpeg');
+
+                            resizedImages.push({"filename":file.name, "dataUrl":dataUrl});
+
+                            waitThenSubmitImages(imageselect);
+                        },
+                        {
+                            maxWidth: 512,
+                            maxHeight: 512,
+                            orientation: true,
+                            canvas: true
+                        }
+                    );
+                }
             } else {
                 displayErrorModal("The file you uploaded is not an image");
                 return;
