@@ -18,10 +18,27 @@
 				overflow: hidden;
 			}
 		</style>
-        <script src="http://threejs.org/build/three.min.js"></script>
+        <script src="{% static 'js/three.min.js' %}"></script>
 		<script src="{% static 'averagefaces/js/controls/OrbitControls.js' %}"></script>
+        <script src="{% static 'js/msgpack.min.js' %}"></script>
         <script>
 			var camera, controls, scene, renderer;
+
+            function downloadMsgPack(url, callback) {
+                var oReq = new XMLHttpRequest();
+                oReq.open("GET", url, true);
+                oReq.responseType = "arraybuffer";
+
+                oReq.onload = function (oEvent) {
+                    var arrayBuffer = oReq.response; // Note: not oReq.responseText
+                    if (arrayBuffer) {
+                        var byteArray = new Uint8Array(arrayBuffer);
+                        var data = msgpack.decode(byteArray);
+                        callback(data);
+                    }
+                };
+                oReq.send();
+            }
 
             function onLoad() {
                 init();
@@ -29,7 +46,11 @@
             }
 
 			function loadmesh(FACENAME, i){
-				return function ( geometry ) {
+                var loader = new THREE.JSONLoader();
+				return function ( jsonobj ) {
+                    var object = loader.parse(jsonobj);
+                    var geometry = object.geometry;
+
 					console.log(""+i+" "+FACENAME);
 					var material = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture(FACENAME+'.jpg') } );
 					var mesh = new THREE.Mesh( geometry, material );
@@ -52,10 +73,12 @@
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
-                camera.position.z = 400;
+                camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
+{#				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );#}
+                camera.position.x = 400;
                 camera.position.y = -100;
-				camera.position.x = 400;
+                camera.position.z = 600;
+
 
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -64,24 +87,22 @@
 				controls.dampingFactor = 0.25;
 				controls.enableZoom = true;
 
-				var FACENAMES = [
-                    "{% static 'averagefaces/averageFaces_F_1.46_30' %}",
-					"{% static 'averagefaces/averageFaces_F_2.21_182' %}",
-					"{% static 'averagefaces/averageFaces_F_2.96_311' %}",
-					"{% static 'averagefaces/averageFaces_F_3.71_298' %}",
-					"{% static 'averagefaces/averageFaces_F_4.46_115' %}",
-                    "{% static 'averagefaces/averageFaces_M_1.46_70' %}",
-					"{% static 'averagefaces/averageFaces_M_2.21_429' %}",
-					"{% static 'averagefaces/averageFaces_M_2.96_548' %}",
-					"{% static 'averagefaces/averageFaces_M_3.71_189' %}",
-					"{% static 'averagefaces/averageFaces_M_4.46_25' %}",
-				];
+                var FACENAMES = [
+                    "{% static 'averagefaces/averageFaces_F_2.50_23' %}",
+                    "{% static 'averagefaces/averageFaces_F_4.17_93' %}",
+                    "{% static 'averagefaces/averageFaces_F_5.83_526' %}",
+                    "{% static 'averagefaces/averageFaces_F_7.50_1055' %}",
+                    "{% static 'averagefaces/averageFaces_F_9.17_42' %}",
+                    "{% static 'averagefaces/averageFaces_M_2.50_20' %}",
+                    "{% static 'averagefaces/averageFaces_M_4.17_59' %}",
+                    "{% static 'averagefaces/averageFaces_M_5.83_382' %}",
+                    "{% static 'averagefaces/averageFaces_M_7.50_911' %}",
+                    "{% static 'averagefaces/averageFaces_M_9.17_138' %}",
+                ];
 
 				for (var i in FACENAMES) {
 					var FACENAME = FACENAMES[i];
-
-					var loader = new THREE.JSONLoader();
-					loader.load( FACENAME+'.json', loadmesh(FACENAME,i));
+                    downloadMsgPack(FACENAME+'.msg', loadmesh(FACENAME,i));
 				}
 
 
@@ -93,7 +114,11 @@
 			}
 
 			function onWindowResize() {
-				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.left = window.innerWidth / - 2;
+				camera.right = window.innerWidth / 2;
+				camera.top = window.innerHeight / 2;
+				camera.bottom = window.innerHeight / - 2;
+
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
