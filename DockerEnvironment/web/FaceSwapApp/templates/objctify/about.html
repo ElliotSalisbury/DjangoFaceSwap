@@ -18,18 +18,25 @@
         <div class="col-xs-12">
             <p>
                 Beauty is in the eye of the beholder, or so they say.
-                I don't agree with this, my theory is there's some underlying characteristics of peoples faces that are more attractive than others, and in this experiment, I set out to discover what those are.
-                We begin by looking at <a href="http://www.reddit.com/r/RateMe">r/RateMe</a>, a subreddit where users can submit pictures of themselves and commenters will provide constructive criticism.
+                But I don't agree with this, I think there is a fair amount of consensus amongst people, atleast within the same culture, about who is and is not attractive.
+
+                I want to find out what intrinsic characteristics make a person more or less attractive.
+                With that knowledge, we could rank a user's photos helping them choose which photos to use on social media (Facebook, Tinder, etc.),
+                or create instagram or snapchat like filters that would edit the photo to appear more attractive.
             </p>
 
             <p>
-                Looking at a typical submission, I can see that a lot of commenters rate the subject on the out-of-ten scale, 1 being very unattractive, 10 being very attractive.
-                Taking the average of these ratings could be a useful gauge of a users attractiveness.
-                Thus, the first step to identifying attractiveness was to scrape all the submissions off r/RateMe, filtering out submissions where there was less than 3 comments that rate the subject.
-                Leaving us with 3,342 submissions, 1798 from women, and 1544 from men.
+                To start I'll need a large dataset containing imagery of people who have been ranked in attractiveness.
+                I choose <a href="http://www.reddit.com/r/RateMe">r/RateMe</a>, a subreddit where users can submit pictures of themselves and commenters will provide constructive criticism
+                (I just want to point out here that reddit is a highly biased source of this data, and this is in no way a serious scientific endeavour).
+
+                Looking at a typical submission, I can see that a lot of the commenters rate the subject on the out-of-ten scale, 1 being very unattractive, 10 being very attractive.
+                By taking the average of these ratings, we could calculate the consensus of how attractive the subject is.
+                Thus, I wrote a script to scrape all the submissions off r/RateMe, look through the comments for out-of-ten ratings, and filter out submissions where there was less than 3 ratings for the subject.
+                Leaving us with 3,491 submissions, 1868 from women, and 1623 from men.
             </p>
             <p>
-                We generate a histogram of commenter ratings.
+                Let's take a look at our data, how do the commenters tend to rate the users of r/RateMe? And by taking the average of these ratings, how attractive are the users?
             </p>
         </div>
     </div>
@@ -50,11 +57,12 @@
     <div class="row">
         <div class="col-xs-12">
             <p>
-                If the out-of-ten rating scale was linear, then an average person should score a 5.
-                Instead, we see in this data that the bell curve is centered around 7.5 ish, half way between 5 and 10.
-                Either reddit users are all above average, or rating a user below a 5 feels mean.
+                The obvious thing to see here, is that if the out-of-ten rating scale was linear, then an average person should score a 5.
+                Instead, we see in this data that the curve is centered around 7.5 ish.
+                Either reddit users (or those willing to subject themselves to public scrutiny) are all above average, or most rater's shift their range between 5-10, because giving below a 5 feels too mean.
 
-                That's not too surprising, but instead look at the number of ratings these submissions got, Women are far more likely to get rated out-of-10 than the men.
+                That's probably not too surprising, but instead look at y-axis! There's a massive difference in the number of ratings these submissions got. Women are far more likely to get rated out-of-10 than the men.
+                I looked further into the data, and saw that blah blah blah
             </p>
         </div>
     </div>
@@ -69,13 +77,10 @@
     <div class="row">
         <div class="col-xs-12">
             <p>
-                TODO, compare against count of comments, maybe women get more comments, or maybe people dont rank men
+                The internet is full of trolls, and many of the comments left were incredibly mean.
+                Thus, before we can learn anything from this data, we need to clean it up a bit, and remove any outlier ratings from the dataset.
 
-                I noticed some of the comments left were <a href="https://www.reddit.com/r/Rateme/comments/23eisl/18f_please_be_honest/ch2jszi/">incredibly mean</a>,
-                so in an attempt to filter out trolling I removed outlier ratings.
-                Any rating that was further than 2 standard deviations from the median was considered an outlier.
-
-                Lets sort these submissions by their average ratings and plot with their standard deviation.
+                We can now rank the submissions by their average ratings.
             </p>
         </div>
     </div>
@@ -93,9 +98,9 @@
         </div>
         <div class="col-sm-4">
             <p>
-                Okay, so what we're interested in here, is what features do the top attractive people have, that the bottom least attractive people don't have.
+                Okay, what I'm really interested in here, is what features do the top attractive people have, that the bottom least attractive people don't have.
                 For that we need to use computer vision to analyse the images submitted by the users.
-                I use a <a href="http://dlib.net/">facial landmark detector</a>, and a <a href="https://github.com/patrikhuber/eos">3D face mesh fitting library</a>.
+                Without going in to too much technical detail, I use a <a href="http://dlib.net/">facial landmark detector</a>, and a <a href="https://github.com/patrikhuber/eos">3D face mesh fitting library</a>.
                 The landmark detector (Left), looks for faces in images, and identifies a number of points around the chin, eyes, nose, mouth, etc.
                 While the 3D face fitting (Right) takes a 3D model of the average face, and changes the features (e.g, brow shape, chin width, eye location) until it aligns closely with the image and the detected landmarks.
             </p>
@@ -135,9 +140,24 @@
 
                 We can then slightly modify the facial features of the image, until we maximise the attractiveness score.
                 We repeat this step multiple times to maximise the attractiveness score, and then rerender the image with the new modified facial features.
+
+                Let's take a look at an average face, and then morph it to be more attractive, here we can see that for women X, and for men Y
             </p>
         </div>
     </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <p>
+                But this approach has some downsides, it can work well for frontal faces, but once the face turns away from the camera, we start to distort the face too aggressively.
+                We'll need to understand how the face is oriented in 3D space in order to solve this problem.
+                Thus we use 3D face fitting library.
+                works by blah
+
+                Using the same approach as before, we can learn the features that make a user more attractive, and remorph the image.
+            </p>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-sm-6">
             <img src="{% static 'img/beautyisdataful/Female Submissions Sorted by Average Rating.png' %}" class="img-responsive">
