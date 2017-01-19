@@ -67,15 +67,17 @@
     }
     #example_carousel ul li {
         float: left;
+        margin-left:5px;
+        margin-right:5px;
     }
     #example_carousel ul li img {
         position: relative;
-        height: 100%;
+        height: 200px;
     }
     #example_carousel ul li.active img {
         position: relative;
-        height: 120%;
-        margin-top: -8%;
+        height: 240px;
+        margin-top: -20px;
     }
 </style>
 <script>
@@ -326,12 +328,16 @@
     var resizedImages = [];
     $(function() {
         $('#imageselect_F').change(function(event) {
-            resizedImages = [];
+            if (!browser.name.includes("IE")) {
+                resizedImages = [];
+            }
             $("#uploadform > input[name='gender']").val("F");
             correctImagesAndUpload(event.target);
         });
         $('#imageselect_M').change(function(event) {
-            resizedImages = [];
+            if (!browser.name.includes("IE")) {
+                resizedImages = [];
+            }
             $("#uploadform > input[name='gender']").val("M");
             correctImagesAndUpload(event.target);
         });
@@ -407,15 +413,15 @@
 </div>
 
 <div class="row">
-    <label class="btn btn-primary btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-2 col-md-offset-1 textwrap">
-        Upload Your Own (Male)
-        <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
-        <input id="imageselect_M" class="btn" type="file" accept="image/*" multiple style="display: none;">
-    </label>
     <label class="btn btn-info btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-0 col-md-offset-2 textwrap">
         Upload Your Own (Female)
         <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
         <input id="imageselect_F" class="btn" type="file" accept="image/*" multiple style="display: none;">
+    </label>
+    <label class="btn btn-primary btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-2 col-md-offset-1 textwrap">
+        Upload Your Own (Male)
+        <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
+        <input id="imageselect_M" class="btn" type="file" accept="image/*" multiple style="display: none;">
     </label>
     <form id="uploadform" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
         <input type="hidden" name="type" value="1">

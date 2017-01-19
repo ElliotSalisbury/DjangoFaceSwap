@@ -4,6 +4,16 @@
 
 {% block head_block %}
     <style>
+        #message {
+            position: absolute;
+            top: 64px;
+            right: 0;
+            width:400px;
+            cursor: pointer;
+        }
+        #inner-message {
+            margin: 0 auto;
+        }
     </style>
     <script>
     </script>
@@ -27,7 +37,7 @@
 
             <p>
                 To start I'll need a large dataset containing imagery of people who have been ranked in attractiveness.
-                I choose <a href="http://www.reddit.com/r/RateMe">r/RateMe</a>, a subreddit where users can submit pictures of themselves and commenters will provide constructive criticism
+                I chose <a href="http://www.reddit.com/r/RateMe">r/RateMe</a>, a subreddit where users can submit pictures of themselves and commenters will provide constructive criticism
                 (I just want to point out here that reddit is a highly biased source of this data, and this is in no way a serious scientific endeavour).
 
                 Looking at a typical submission, I can see that a lot of the commenters rate the subject on the out-of-ten scale, 1 being very unattractive, 10 being very attractive.
@@ -42,10 +52,10 @@
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <img src="{% static 'img/beautyisdataful/Female Ratings.png' %}" class="img-responsive">
+            <img src="{% static 'img/beautyisdataful/Ratings Given to Females.png' %}" class="img-responsive">
         </div>
         <div class="col-sm-6">
-            <img src="{% static 'img/beautyisdataful/Male Ratings.png' %}" class="img-responsive">
+            <img src="{% static 'img/beautyisdataful/Ratings Given to Males.png' %}" class="img-responsive">
         </div>
         <div class="col-sm-6">
             <img src="{% static 'img/beautyisdataful/Female Attractiveness.png' %}" class="img-responsive">
@@ -61,17 +71,23 @@
                 Instead, we see in this data that the curve is centered around 7.5 ish.
                 Either reddit users (or those willing to subject themselves to public scrutiny) are all above average, or most rater's shift their range between 5-10, because giving below a 5 feels too mean.
 
-                That's probably not too surprising, but instead look at y-axis! There's a massive difference in the number of ratings these submissions got. Women are far more likely to get rated out-of-10 than the men.
-                I looked further into the data, and saw that blah blah blah
+                That's probably not too surprising, but instead look at the y-axis! There's a massive difference in the number of ratings these submissions got. Women are far more likely to get rated out-of-10 than the men.
+                Looked further into the data, and saw that women get a ton more comments on their submissions than the men.
             </p>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <img src="{% static 'img/beautyisdataful/Female Submissions Number of Ratings.png' %}" class="img-responsive">
+            <img src="{% static 'img/beautyisdataful/Number of Ratings Per Female Submissions.png' %}" class="img-responsive">
         </div>
         <div class="col-sm-6">
-            <img src="{% static 'img/beautyisdataful/Male Submissions Number of Ratings.png' %}" class="img-responsive">
+            <img src="{% static 'img/beautyisdataful/Number of Ratings Per Male Submissions.png' %}" class="img-responsive">
+        </div>
+        <div class="col-sm-6">
+            <img src="{% static 'img/beautyisdataful/Number of Comments Per Female Submissions.png' %}" class="img-responsive">
+        </div>
+        <div class="col-sm-6">
+            <img src="{% static 'img/beautyisdataful/Number of Comments Per Male Submissions.png' %}" class="img-responsive">
         </div>
     </div>
     <div class="row">
@@ -96,27 +112,68 @@
         <div class="col-sm-4">
             <img src="{% static 'img/beautyisdataful/Landmarks.jpg' %}" class="img-responsive">
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-8">
             <p>
                 Okay, what I'm really interested in here, is what features do the top attractive people have, that the bottom least attractive people don't have.
                 For that we need to use computer vision to analyse the images submitted by the users.
-                Without going in to too much technical detail, I use a <a href="http://dlib.net/">facial landmark detector</a>, and a <a href="https://github.com/patrikhuber/eos">3D face mesh fitting library</a>.
-                The landmark detector (Left), looks for faces in images, and identifies a number of points around the chin, eyes, nose, mouth, etc.
-                While the 3D face fitting (Right) takes a 3D model of the average face, and changes the features (e.g, brow shape, chin width, eye location) until it aligns closely with the image and the detected landmarks.
+                Without going in to too much technical detail, I use a <a href="http://dlib.net/">facial landmark detector</a>.
+                The landmark detector (Left), looks for faces in images, and identifies a number of key points (or landmarks) around the chin, eyes, nose, mouth, etc.
+                From these points we can calculate a set of features that we might be interested in, e.g., distances from the eyes, the nose, etc.
+            </p>
+            <p>
+                With this data we can train a machine learning algorithm to identify the face shape that reddit deems most attractive.
+                We can use this algorithm to predict the attractiveness of a given face shape.
+                Furthermore, if we can give a score to a face shape, then we can keep modifying this shape until we get a higher score.
+                Once we've maximised the score, we can rerender the original image with the new modified facial features.
+                A lot of this work was inspired heavily from a SIGGRAPH'08 paper, <a href="http://leyvand.com/beautification2008/">Data-Driven Enhancement of Facial Attractiveness</a>
+            </p>
+            <p>
+                We can then observe how these features change from the unattractive, to the attractive redditors.
+                Below we show the average face, generated from all the images in our dataset.
+                We then animate that average face towards those rated unattractive(left), and attractive(right).
+                In reality, the differences are subtle but the animations here have been exaggerated to show the main differences.
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-4" style="padding:0;">
+            <img src="{% static 'img/beautyisdataful/2D Faces/AvgFace_F_BAD.gif' %}" class="img-responsive">
+        </div>
+        <div class="col-xs-4" style="padding:0;">
+            <img src="{% static 'img/beautyisdataful/2D Faces/AvgFace_F_1.jpg' %}" class="img-responsive">
+        </div>
+        <div class="col-xs-4" style="padding:0;">
+            <img src="{% static 'img/beautyisdataful/2D Faces/AvgFace_F_GOOD.gif' %}" class="img-responsive">
+        </div>
+        <div class="col-xs-4" style="padding:0;">
+            <img src="{% static 'img/beautyisdataful/2D Faces/AvgFace_M_BAD.gif' %}" class="img-responsive">
+        </div>
+        <div class="col-xs-4" style="padding:0;">
+            <img src="{% static 'img/beautyisdataful/2D Faces/AvgFace_M_1.jpg' %}" class="img-responsive">
+        </div>
+        <div class="col-xs-4" style="padding:0;">
+            <img src="{% static 'img/beautyisdataful/2D Faces/AvgFace_M_GOOD.gif' %}" class="img-responsive">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-8">
+            <p>
+                We can see that short round faces tend to be unattractive, and longer thinner faces are rated more attractive.
+                For women, the angle of the eyes change, and the size of the lips. While for men the shape of the chin and face length is more important.
+            </p>
+            <p>
+                However, this approach has some downsides, it may work well for frontal faces, but once the face turns away from the camera, we start to distort the face in ways that appear unnatural.
+                We'll need to understand how the face is oriented in 3D space in order to solve this problem.
+                The next step was to use a <a href="https://github.com/patrikhuber/eos">3D face mesh fitting library</a>.
+                The 3D face fitting (Right) uses a 3D model of the average human face, and works by changing the orientation and the features (e.g, brow shape, chin width, eye location) until it aligns closely with the image and the detected landmarks.
             </p>
         </div>
         <div class="col-sm-4">
             <img src="{% static 'img/beautyisdataful/Mesh.jpg' %}" class="img-responsive">
         </div>
     </div>
-    <div class="row">
-        <div class="col-xs-12">
-            <p>
-                Now we can calculate the 3D face shape of all of our r/RateMe users, and attempt to find the features that are more common amongst the attractive users.
-                Below we show the average faces generated from our users.
-            </p>
-        </div>
-    </div>
+
+
     <div class="row">
         <div class="col-xs-12">
             <iframe src="{% url 'averageFaces' %}" style="width:100%; height:400px"></iframe>
@@ -132,31 +189,8 @@
             <iframe src="{% url 'morphFaces' %}" style="width:100%; height:400px"></iframe>
         </div>
     </div>
-    <div class="row">
-        <div class="col-xs-12">
-            <p>
-                With this data we can train a machine learning algorithm to identify the face shape that reddit deems most attractive.
-                We can use the this algorithm to predict a users attractiveness.
 
-                We can then slightly modify the facial features of the image, until we maximise the attractiveness score.
-                We repeat this step multiple times to maximise the attractiveness score, and then rerender the image with the new modified facial features.
 
-                Let's take a look at an average face, and then morph it to be more attractive, here we can see that for women X, and for men Y
-            </p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
-            <p>
-                But this approach has some downsides, it can work well for frontal faces, but once the face turns away from the camera, we start to distort the face too aggressively.
-                We'll need to understand how the face is oriented in 3D space in order to solve this problem.
-                Thus we use 3D face fitting library.
-                works by blah
-
-                Using the same approach as before, we can learn the features that make a user more attractive, and remorph the image.
-            </p>
-        </div>
-    </div>
 
     <div class="row">
         <div class="col-sm-6">
@@ -167,4 +201,11 @@
         </div>
     </div>
 
+    <a href="https://crowdrobotics.org/">
+    <div id="message">
+        <div class="alert alert-warning">
+            <b>Heads up!</b> I'm currently looking for a job. If you like this work, check out my CV and some of my other projects.
+        </div>
+    </div>
+    </a>
 {% endblock %}
