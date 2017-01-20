@@ -127,7 +127,7 @@
                 image.src = data.result.images[i].improved;
                 $(image).attr("improved", data.result.images[i].improved);
                 $(image).attr("orig", resizedImages[i].dataUrl);
-                $(image).addClass("hoverImpToOrig col-xs-12 col-sm-6");
+                $(image).addClass("hoverImgToOrig col-xs-12 col-sm-6");
                 $(image).css("padding",1);
 
                 $('#improvedImages').append(image);
@@ -136,7 +136,8 @@
                 image.src = data.result.images[i].improvedF;
                 $(image).attr("improved", data.result.images[i].improvedF);
                 $(image).attr("orig", resizedImages[i].dataUrl);
-                $(image).addClass("hoverImpToOrig col-xs-12 col-sm-6");
+                $(image).attr("toggleOrig", false);
+                $(image).addClass("hoverImgToOrig col-xs-12 col-sm-6");
                 $(image).css("padding",1);
 
                 $('#improvedImages').append(image);
@@ -145,12 +146,21 @@
             //set the rating
             $("#rating").html(parseFloat(allRatings[0]).toFixed(2));
 
-            $(".hoverImpToOrig").hover(function(event){
+            $(".hoverImgToOrig").hover(function(event){
                 if (event.ctrlKey) {
                     $(event.target).attr("src", $(event.target).attr("orig"));
                 }
             }, function(event) {
                 $(event.target).attr("src", $(event.target).attr("improved"));
+            });
+            $(".hoverImgToOrig").click(function(event){
+                if ($(event.target).attr("toggleOrig") === "true") {
+                    $(image).attr("toggleOrig", false);
+                    $(event.target).attr("src", $(event.target).attr("improved"));
+                }else {
+                    $(image).attr("toggleOrig", true);
+                    $(event.target).attr("src", $(event.target).attr("orig"));
+                }
             });
 
             $("#resultswaiting").hide();
@@ -475,7 +485,7 @@
                         <span class="glyphicon glyphicon-arrow-left hidden-xs-down" aria-hidden="true"></span>
                         <span id="rating" style="font-size: 50px; font-weight: bold;">1</span>
 
-                        <p>Here are our tweaked images.<br>(ctrl+hover over them to see the original)</p>
+                        <p>Here are our tweaked images.<br>(tap or ctrl+hover over them to see the original)</p>
                         <span class="glyphicon glyphicon-arrow-right hidden-xs-down" aria-hidden="true"></span>
                     </div>
                     <div class="col-xs-12 col-sm-7">
