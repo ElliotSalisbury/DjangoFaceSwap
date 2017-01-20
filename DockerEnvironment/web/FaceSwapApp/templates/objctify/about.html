@@ -131,28 +131,22 @@
                 We can then observe how these features change from the unattractive, to the attractive redditors.
                 Below we show the average face, generated from all the images in our dataset.
                 We then animate that average face towards those rated unattractive(left), and attractive(right).
-                In reality, the differences are subtle but the animations here have been exaggerated to show the main differences.
+                In reality, the differences are subtle but the animations here have been exaggerated to show the contrast.
             </p>
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-4" style="padding:0;">
-            <img src="{% static 'img/beautyisdataful/2D Faces/AvgFace_F_BAD.gif' %}" class="img-responsive">
+        <div class="col-xs-12" style="padding:0;">
+            <video width="100%" autoplay controls loop>
+              <source src="{% static 'img/beautyisdataful/2D Faces/female.webm' %}" type="video/webm">
+                Your browser does not support the video tag.
+            </video>
         </div>
-        <div class="col-xs-4" style="padding:0;">
-            <img src="{% static 'img/beautyisdataful/2D Faces/AvgFace_F_1.jpg' %}" class="img-responsive">
-        </div>
-        <div class="col-xs-4" style="padding:0;">
-            <img src="{% static 'img/beautyisdataful/2D Faces/AvgFace_F_GOOD.gif' %}" class="img-responsive">
-        </div>
-        <div class="col-xs-4" style="padding:0;">
-            <img src="{% static 'img/beautyisdataful/2D Faces/AvgFace_M_BAD.gif' %}" class="img-responsive">
-        </div>
-        <div class="col-xs-4" style="padding:0;">
-            <img src="{% static 'img/beautyisdataful/2D Faces/AvgFace_M_1.jpg' %}" class="img-responsive">
-        </div>
-        <div class="col-xs-4" style="padding:0;">
-            <img src="{% static 'img/beautyisdataful/2D Faces/AvgFace_M_GOOD.gif' %}" class="img-responsive">
+        <div class="col-xs-12" style="padding:0;">
+            <video width="100%" autoplay controls loop>
+              <source src="{% static 'img/beautyisdataful/2D Faces/male.webm' %}" type="video/webm">
+                Your browser does not support the video tag.
+            </video>
         </div>
     </div>
     <div class="row">

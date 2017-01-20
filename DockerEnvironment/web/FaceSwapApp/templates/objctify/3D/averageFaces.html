@@ -7,17 +7,38 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #000;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
 				font-weight: bold;
 
-				background-color: #fff;
+				background-color: #444444;
 				margin: 0px;
 				overflow: hidden;
+
+                background-image: url("{% static 'img/beautyisdataful/3D Faces/banner.jpg' %}");
+                background-size: cover;
 			}
+
+            #clickToContinue {
+                position: absolute;
+                width:200px;
+                height:200px;
+                top:50%;
+                left:50%;
+                margin: -100px 0 0 -100px;
+                background-color: #cccccc;
+                border-radius: 100px;
+                border-color: #000000;
+                border-width: 4px;
+                border-style: solid;
+            }
+            #clickToContinue span {
+                line-height:200px;
+            }
+
 		</style>
+        <script type="text/javascript" src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
         <script src="{% static 'js/three.min.js' %}"></script>
 		<script src="{% static 'averagefaces/js/controls/OrbitControls.js' %}"></script>
         <script src="{% static 'js/msgpack.min.js' %}"></script>
@@ -133,9 +154,19 @@
 			function render() {
 				renderer.render( scene, camera );
 			}
+
+            $(function() {
+                $("#clickToContinue").click(function() {
+                    $("#clickToContinue").hide();
+                    onLoad();
+                });
+            })
 		</script>
 	</head>
-	<body onload="onLoad();">
+	<body>
 		<div id="container"></div>
+        <div id="clickToContinue">
+            <span>Click To Interact</span>
+        </div>
 	</body>
 </html>
