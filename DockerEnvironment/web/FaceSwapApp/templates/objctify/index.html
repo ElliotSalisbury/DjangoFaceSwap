@@ -3,6 +3,7 @@
 
 
 {% block head_block %}
+    <script type="text/javascript" src="{% static 'js/carousel.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/ua-parser.min.js' %}"></script>
     <script>
         if (!String.prototype.includes) {
@@ -46,38 +47,6 @@
         overflow-x: hidden;
         overflow-y: auto;
         white-space:nowrap
-    }
-
-    #example_carousel {
-        position: relative;
-        height: 200px;
-        margin-bottom: 40px;
-        border: 1px solid rgb(240,240,240);
-        overflow: hidden;
-    }
-    #example_carousel ul{
-        position: relative;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        width: 20000em;
-        white-space:nowrap;
-        transition-duration: 200ms;
-        transition-timing-function: linear;
-    }
-    #example_carousel ul li {
-        float: left;
-        margin-left:5px;
-        margin-right:5px;
-    }
-    #example_carousel ul li img {
-        position: relative;
-        height: 200px;
-    }
-    #example_carousel ul li.active img {
-        position: relative;
-        height: 240px;
-        margin-top: -20px;
     }
 </style>
 <script>
@@ -268,28 +237,6 @@
         return new Blob([uInt8Array], {type: contentType});
     }
 
-    function slideToNextActive(direction) {
-        var currentActive = $("#example_carousel > ul > li.active");
-        if (direction > 0) {
-            var nextActive = $("#example_carousel > ul > li.active").next();
-            if (nextActive.length > 0) {
-                currentActive.removeClass("active");
-                nextActive.addClass("active");
-            }
-        }else if (direction < 0) {
-            var nextActive = $("#example_carousel > ul > li.active").prev();
-            if (nextActive.length > 0) {
-                currentActive.removeClass("active");
-                nextActive.addClass("active");
-            }
-        }
-
-        var newMidPoint = $("#example_carousel").width()/2;
-        newMidPoint = newMidPoint - $("#example_carousel > ul > li.active").position().left;
-        newMidPoint = newMidPoint - $("#example_carousel > ul > li.active img").width()/2;
-        $("#example_carousel > ul").css("left",newMidPoint);
-    }
-
     function correctImagesAndUpload(imageselect) {
         for (var i = 0; i < imageselect.files.length; i++) {
             var file = imageselect.files[i];
@@ -357,16 +304,6 @@
             var exampleData = examples[i];
             resizedImages = [{dataUrl:exampleData.result.images[0].original}];
             checkAndDisplayResults(exampleData);
-        });
-
-        $("#example_carousel > a.right.carousel-control").click(function() {
-            slideToNextActive(1);
-        });
-        $("#example_carousel > a.left.carousel-control").click(function() {
-            slideToNextActive(-1);
-        });
-        $(window).on('resize', function(){
-            slideToNextActive(0);
         });
 
         var midI = parseInt(examples.length / 2);

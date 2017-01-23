@@ -5,19 +5,40 @@
 		<title>Morph Faces</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
+				<style>
 			body {
-				color: #000;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
 				font-weight: bold;
 
-				background-color: #fff;
+				background-color: #444444;
 				margin: 0px;
 				overflow: hidden;
+
+                background-image: url("{% static 'img/beautyisdataful/3D Faces/banner.jpg' %}");
+                background-size: cover;
 			}
+
+            #clickToContinue {
+                position: absolute;
+                width:200px;
+                height:200px;
+                top:50%;
+                left:50%;
+                margin: -100px 0 0 -100px;
+                background-color: #cccccc;
+                border-radius: 100px;
+                border-color: #000000;
+                border-width: 4px;
+                border-style: solid;
+            }
+            #clickToContinue span {
+                line-height:200px;
+            }
+
 		</style>
+        <script type="text/javascript" src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
         <script src="{% static 'js/three.min.js' %}"></script>
 		<script src="{% static 'averagefaces/js/controls/OrbitControls.js' %}"></script>
         <script src="{% static 'js/msgpack.min.js' %}"></script>
@@ -63,18 +84,18 @@
 			var fragShader = document.getElementById('fragment_shh').innerHTML;
 
 			var FACENAMES = [
-				"{% static 'averagefaces/averageFaces_F_2.50_23' %}",
-                "{% static 'averagefaces/averageFaces_F_4.17_93' %}",
-                "{% static 'averagefaces/averageFaces_F_5.83_526' %}",
-                "{% static 'averagefaces/averageFaces_F_7.50_1055' %}",
-                "{% static 'averagefaces/averageFaces_F_9.17_42' %}",
+                    "{% static 'averagefaces/averageFaces_F_0_50' %}",
+                    "{% static 'averagefaces/averageFaces_F_1_50' %}",
+                    "{% static 'averagefaces/averageFaces_F_2_50' %}",
+                    "{% static 'averagefaces/averageFaces_F_3_50' %}",
+                    "{% static 'averagefaces/averageFaces_F_4_50' %}",
 			];
 {#            var FACENAMES = [#}
-{#				"{% static 'averagefaces/averageFaces_M_2.50_20' %}",#}
-{#                "{% static 'averagefaces/averageFaces_M_4.17_59' %}",#}
-{#                "{% static 'averagefaces/averageFaces_M_5.83_382' %}",#}
-{#                "{% static 'averagefaces/averageFaces_M_7.50_911' %}",#}
-{#                "{% static 'averagefaces/averageFaces_M_9.17_138' %}",#}
+{#                    "{% static 'averagefaces/averageFaces_M_0_50' %}",#}
+{#                    "{% static 'averagefaces/averageFaces_M_1_50' %}",#}
+{#                    "{% static 'averagefaces/averageFaces_M_2_50' %}",#}
+{#                    "{% static 'averagefaces/averageFaces_M_3_50' %}",#}
+{#                    "{% static 'averagefaces/averageFaces_M_4_50' %}",#}
 {#			];#}
 			var geometrys = [];
 
@@ -153,7 +174,7 @@
 
 					mixer = new THREE.AnimationMixer( face );
 					var clip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'gallop', faceGeometry.morphTargets, 30 );
-					mixer.clipAction( clip ).setDuration( 15 ).play();
+					mixer.clipAction( clip ).setDuration( 5 ).play();
 				}
 			}
 
@@ -182,7 +203,7 @@
 
                 for (var i in FACENAMES) {
 					var FACENAME = FACENAMES[i];
-                    downloadMsgPack(FACENAME+'.msg', loadmesh(FACENAME,i));
+                    downloadMsgPack(FACENAME+'_fitted.msg', loadmesh(FACENAME,i));
 				}
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -219,10 +240,20 @@
                 init();
 			    animate();
             }
+
+            $(function() {
+                $("#clickToContinue").click(function() {
+                    $("#clickToContinue").hide();
+                    onLoad();
+                });
+            })
 		</script>
 	</head>
 
-	<body onload="onLoad();">
+	<body>
 		<div id="container"></div>
+        <div id="clickToContinue">
+            <span>Click To Interact</span>
+        </div>
 	</body>
 </html>

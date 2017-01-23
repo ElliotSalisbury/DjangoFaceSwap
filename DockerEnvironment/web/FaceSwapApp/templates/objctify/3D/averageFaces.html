@@ -109,21 +109,21 @@
 				controls.enableZoom = true;
 
                 var FACENAMES = [
-                    "{% static 'averagefaces/averageFaces_F_2.50_23' %}",
-                    "{% static 'averagefaces/averageFaces_F_4.17_93' %}",
-                    "{% static 'averagefaces/averageFaces_F_5.83_526' %}",
-                    "{% static 'averagefaces/averageFaces_F_7.50_1055' %}",
-                    "{% static 'averagefaces/averageFaces_F_9.17_42' %}",
-                    "{% static 'averagefaces/averageFaces_M_2.50_20' %}",
-                    "{% static 'averagefaces/averageFaces_M_4.17_59' %}",
-                    "{% static 'averagefaces/averageFaces_M_5.83_382' %}",
-                    "{% static 'averagefaces/averageFaces_M_7.50_911' %}",
-                    "{% static 'averagefaces/averageFaces_M_9.17_138' %}",
+                    "{% static 'averagefaces/averageFaces_F_0_50' %}",
+                    "{% static 'averagefaces/averageFaces_F_1_50' %}",
+                    "{% static 'averagefaces/averageFaces_F_2_50' %}",
+                    "{% static 'averagefaces/averageFaces_F_3_50' %}",
+                    "{% static 'averagefaces/averageFaces_F_4_50' %}",
+                    "{% static 'averagefaces/averageFaces_M_0_50' %}",
+                    "{% static 'averagefaces/averageFaces_M_1_50' %}",
+                    "{% static 'averagefaces/averageFaces_M_2_50' %}",
+                    "{% static 'averagefaces/averageFaces_M_3_50' %}",
+                    "{% static 'averagefaces/averageFaces_M_4_50' %}",
                 ];
 
 				for (var i in FACENAMES) {
 					var FACENAME = FACENAMES[i];
-                    downloadMsgPack(FACENAME+'.msg', loadmesh(FACENAME,i));
+                    downloadMsgPack(FACENAME+'_fitted.msg', loadmesh(FACENAME,i));
 				}
 
 

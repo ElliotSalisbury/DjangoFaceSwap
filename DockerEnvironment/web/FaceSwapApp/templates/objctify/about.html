@@ -3,12 +3,12 @@
 
 
 {% block head_block %}
+    <script type="text/javascript" src="{% static 'js/carousel.js' %}"></script>
     <style>
         #message {
             position: absolute;
             top: 64px;
             right: 0;
-            width:400px;
             cursor: pointer;
         }
         #inner-message {
@@ -16,10 +16,41 @@
         }
     </style>
     <script>
+    function changeSrc(target, num) {
+        var currSrc = $(target).attr("src");
+        currSrc = currSrc.split("_")[0];
+        currSrc = currSrc + "_" + num + ".jpg";
+        $(target).attr("src", currSrc)
+    }
+    $(function() {
+        $("#example_carousel > ul > li > img").hover(function(event){
+            changeSrc(event.target, 2);
+        }, function(event) {
+            changeSrc(event.target, 1);
+        });
+        $("#example_carousel > ul > li > img").click(function(event){
+            if ($(event.target).attr("toggleOrig") === "true") {
+                $(event.target).attr("toggleOrig", false);
+                changeSrc(event.target, 2);
+            }else {
+                $(event.target).attr("toggleOrig", true);
+                changeSrc(event.target, 1);
+            }
+        });
+    });
     </script>
 {% endblock %}
 
 {% block content_block %}
+{#    <div class="row">#}
+{#    <a href="https://crowdrobotics.org/">#}
+{#    <div id="message" class="col-xs-12 col-sm-4">#}
+{#        <div class="alert alert-warning">#}
+{#            <b>Heads up!</b> I'm currently looking for a job. If you like this work, check out my CV and some of my other projects.#}
+{#        </div>#}
+{#    </div>#}
+{#    </a>#}
+{#    </div>#}
     <div class="row center-text">
         <h1 class="title">Beauty Is Dataful</h1>
     </div>
@@ -51,18 +82,19 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-6">
-            <img src="{% static 'img/beautyisdataful/Ratings Given to Females.png' %}" class="img-responsive">
-        </div>
-        <div class="col-sm-6">
-            <img src="{% static 'img/beautyisdataful/Ratings Given to Males.png' %}" class="img-responsive">
-        </div>
-        <div class="col-sm-6">
-            <img src="{% static 'img/beautyisdataful/Female Attractiveness.png' %}" class="img-responsive">
-        </div>
-        <div class="col-sm-6">
-            <img src="{% static 'img/beautyisdataful/Male Attractiveness.png' %}" class="img-responsive">
-        </div>
+            <div class="col-sm-6">
+                <img src="{% static 'img/beautyisdataful/Ratings Given to Females.png' %}" class="img-responsive">
+            </div>
+            <div class="col-sm-6">
+                <img src="{% static 'img/beautyisdataful/Ratings Given to Males.png' %}" class="img-responsive">
+            </div>
+            <div class="col-sm-6">
+                <img src="{% static 'img/beautyisdataful/Female Attractiveness.png' %}" class="img-responsive">
+            </div>
+            <div class="col-sm-6">
+                <img src="{% static 'img/beautyisdataful/Male Attractiveness.png' %}" class="img-responsive">
+            </div>
+
     </div>
     <div class="row">
         <div class="col-xs-12">
@@ -93,10 +125,9 @@
     <div class="row">
         <div class="col-xs-12">
             <p>
-                The internet is full of trolls, and many of the comments left were incredibly mean.
-                Thus, before we can learn anything from this data, we need to clean it up a bit, and remove any outlier ratings from the dataset.
-
-                We can now rank the submissions by their average ratings.
+                Before we can use this data, we need to clean it up a bit. The internet is full of trolls, and many of the comments left were incredibly mean.
+                We remove any outlier ratings from the dataset, and then rank the submissions by their average ratings.
+                The plateaus and lack of variance visible in the male rankings below is due to the lack of ratings given to men.
             </p>
         </div>
     </div>
@@ -110,11 +141,14 @@
     </div>
     <div class="row">
         <div class="col-sm-4">
-            <img src="{% static 'img/beautyisdataful/Landmarks.jpg' %}" class="img-responsive">
+            <figure>
+                <img src="{% static 'img/beautyisdataful/Landmarks.jpg' %}" class="img-responsive">
+                <figcaption class="figure-caption">Lena with detected facial landmarks overlayed.</figcaption>
+            </figure>
         </div>
         <div class="col-sm-8">
             <p>
-                Okay, what I'm really interested in here, is what features do the top attractive people have, that the bottom least attractive people don't have.
+                Okay, what I'm really interested in here, is what features do the top attractive people have, that the bottom least attractive people don't have, the shaded grey regions above.
                 For that we need to use computer vision to analyse the images submitted by the users.
                 Without going in to too much technical detail, I use a <a href="http://dlib.net/">facial landmark detector</a>.
                 The landmark detector (Left), looks for faces in images, and identifies a number of key points (or landmarks) around the chin, eyes, nose, mouth, etc.
@@ -136,18 +170,22 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-12" style="padding:0;">
-            <video width="100%" autoplay controls loop>
-              <source src="{% static 'img/beautyisdataful/2D Faces/female.webm' %}" type="video/webm">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-        <div class="col-xs-12" style="padding:0;">
-            <video width="100%" autoplay controls loop>
-              <source src="{% static 'img/beautyisdataful/2D Faces/male.webm' %}" type="video/webm">
-                Your browser does not support the video tag.
-            </video>
-        </div>
+        <figure>
+            <div class="col-xs-12" style="padding:0;">
+                <video width="100%" autoplay controls loop>
+                  <source src="{% static 'img/beautyisdataful/2D Faces/female.webm' %}" type="video/webm">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div class="col-xs-12" style="padding:0;">
+                <video width="100%" autoplay controls loop>
+                  <source src="{% static 'img/beautyisdataful/2D Faces/male.webm' %}" type="video/webm">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <figcaption class="figure-caption">Animation of the average face morphing towards less (left) and more (right) attractive features.</figcaption>
+        </figure>
+
     </div>
     <div class="row">
         <div class="col-sm-8">
@@ -156,50 +194,102 @@
                 For women, the angle of the eyes change, and the size of the lips. While for men the shape of the chin and face length is more important.
             </p>
             <p>
-                However, this approach has some downsides, it may work well for frontal faces, but once the face turns away from the camera, we start to distort the face in ways that appear unnatural.
+                We could use this approach to create a "2D beautifier", that would subtly morph people's faces towards the more attractive features.
+                However, this approach has some downsides, it may work well for frontal faces, but once the face turns away from the camera, we start to distort the face in ways that appear unnatural (See the <a href="{% url 'home' %}">interactive demo</a> for examples of this).
                 We'll need to understand how the face is oriented in 3D space in order to solve this problem.
                 The next step was to use a <a href="https://github.com/patrikhuber/eos">3D face mesh fitting library</a>.
                 The 3D face fitting (Right) uses a 3D model of the average human face, and works by changing the orientation and the features (e.g, brow shape, chin width, eye location) until it aligns closely with the image and the detected landmarks.
             </p>
         </div>
         <div class="col-sm-4">
-            <img src="{% static 'img/beautyisdataful/Mesh.jpg' %}" class="img-responsive">
+            <figure>
+                <img src="{% static 'img/beautyisdataful/Mesh.jpg' %}" class="img-responsive">
+                <figcaption class="figure-caption">Lena with 3D facial mesh overlayed.</figcaption>
+            </figure>
+
         </div>
     </div>
 
 
     <div class="row">
         <div class="col-xs-12">
-            <iframe src="{% url 'averageFaces' %}" style="width:100%; height:400px"></iframe>
+            <figure>
+                <iframe src="{% url 'averageFaces' %}" style="width:100%; height:400px"></iframe>
+                <figcaption class="figure-caption">Interactive 3D environment showing the 5 average faces from the least to most attractive quintile.</figcaption>
+            </figure>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-8">
             <p>
-                And here we show the same data, morphing from least to most attractive
+                We can use this facial mesh to generate 3D average faces, as we did before.
+                In this instance we generate 5 faces from the lower to upper quintiles.
+                On the right we show an animation morphing between these faces.
+            </p>
+
+            <p>
+                Using this data we create a beautifier that can edit photo's by morphing the facial features towards those that reddit deems more attractive.
+            </p>
+            <p>
+                The face images below are sourced from the US10k dataset, A dataset of faces that also contain an attractiveness measure.
+                I performed similar experiments using this data and got basically the same results, but I present the reddit data here as it is larger, has many more ratings, and is just generally more interesting.
+                However, I didn't want to recognisably use redditors faces without their permission, so I'm using the US10ks publication friendly faces to demonstrate the techniques used.
+            </p>
+            <p>
+                Bainbridge, W.A., Isola, P., & Oliva, A. (2013). The intrinsic memorability of face images. <i>Journal of Experimental Psychology: General. Journal of Experimental Psychology: General</i>, 142(4), 1323-1334.
             </p>
         </div>
         <div class="col-sm-4">
-            <iframe src="{% url 'morphFaces' %}" style="width:100%; height:400px"></iframe>
+            <figure>
+                <iframe src="{% url 'morphFaces' %}" style="width:100%; height:200px"></iframe>
+                <figcaption class="figure-caption">Interactive 3D environment animating from the least to the most attractive faces.</figcaption>
+            </figure>
         </div>
     </div>
-
-
 
     <div class="row">
-        <div class="col-sm-6">
-            <img src="{% static 'img/beautyisdataful/Female Submissions Sorted by Average Rating.png' %}" class="img-responsive">
-        </div>
-        <div class="col-sm-6">
-            <img src="{% static 'img/beautyisdataful/Male Submissions Sorted by Average Rating.png' %}" class="img-responsive">
+        <div class="col-xs-12">
+            <figure>
+                <div id="example_carousel">
+                    <ul>
+                        <li><img src="{% static 'img/beautyisdataful/examples/0_1.jpg' %}"></li>
+                        <li><img src="{% static 'img/beautyisdataful/examples/1_1.jpg' %}"></li>
+                        <li><img src="{% static 'img/beautyisdataful/examples/7_1.jpg' %}"></li>
+                        <li><img src="{% static 'img/beautyisdataful/examples/8_1.jpg' %}"></li>
+                        <li><img src="{% static 'img/beautyisdataful/examples/22_1.jpg' %}"></li>
+                        <li class="active"><img src="{% static 'img/beautyisdataful/examples/15_1.jpg' %}"></li>
+                        <li><img src="{% static 'img/beautyisdataful/examples/24_1.jpg' %}"></li>
+                        <li><img src="{% static 'img/beautyisdataful/examples/9_1.jpg' %}"></li>
+                        <li><img src="{% static 'img/beautyisdataful/examples/34_1.jpg' %}"></li>
+                        <li><img src="{% static 'img/beautyisdataful/examples/33_1.jpg' %}"></li>
+                    </ul>
+                    <a class="left carousel-control" role="button">
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="right carousel-control" role="button">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+                <figcaption class="figure-caption">Hover or click on the images to see the "beautified" versions.</figcaption>
+            </figure>
+
         </div>
     </div>
 
-    <a href="https://crowdrobotics.org/">
-    <div id="message">
-        <div class="alert alert-warning">
-            <b>Heads up!</b> I'm currently looking for a job. If you like this work, check out my CV and some of my other projects.
+    <div class="row">
+        <div class="col-xs-12">
+            <p>
+                That's it! If you want to <a href="{% url 'home' %}">check out an interactive demo of the beautification, see here.</a>
+                <br>
+                Thanks to all the subscribers of r/RateMe.
+            </p>
         </div>
     </div>
-    </a>
+    <div class="row">
+        <div class="col-xs-12">
+            <img src="{% static 'img/beautyisdataful/allfaces.jpg' %}" class="img-responsive">
+        </div>
+    </div>
 {% endblock %}
