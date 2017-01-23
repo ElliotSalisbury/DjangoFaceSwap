@@ -48,23 +48,90 @@
         overflow-y: auto;
         white-space:nowrap
     }
+
+    .imgproved {
+    }
 </style>
 <script>
     var examples = [
         {result: {
             images: [{
-                original: "{% static 'img/examples/lena.bmp' %}",
-                improved: "{% static 'img/examples/lena_improved.jpg' %}",
-                rating: 8.63,
-                name: "lena.bmp"
+                original: "{% static 'img/beautyisdataful/examples/0_1.jpg' %}",
+                improved: "{% static 'img/beautyisdataful/examples/0_2.jpg' %}",
+                rating: 7.10,
+                name: "example.jpg"
             }]
         }},
         {result: {
             images: [{
-                original: "{% static 'img/examples/test.png' %}",
-                improved: "{% static 'img/examples/test_improved.jpg' %}",
-                rating: 5.82,
-                name: "test.png"
+                original: "{% static 'img/beautyisdataful/examples/1_1.jpg' %}",
+                improved: "{% static 'img/beautyisdataful/examples/1_2.jpg' %}",
+                rating: 6.96,
+                name: "example.jpg"
+            }]
+        }},
+        {result: {
+            images: [{
+                original: "{% static 'img/beautyisdataful/examples/7_1.jpg' %}",
+                improved: "{% static 'img/beautyisdataful/examples/7_2.jpg' %}",
+                rating: 7.13,
+                name: "example.jpg"
+            }]
+        }},
+        {result: {
+            images: [{
+                original: "{% static 'img/beautyisdataful/examples/8_1.jpg' %}",
+                improved: "{% static 'img/beautyisdataful/examples/8_2.jpg' %}",
+                rating: 7.10,
+                name: "example.jpg"
+            }]
+        }},
+        {result: {
+            images: [{
+                original: "{% static 'img/beautyisdataful/examples/22_1.jpg' %}",
+                improved: "{% static 'img/beautyisdataful/examples/22_2.jpg' %}",
+                rating: 7.11,
+                name: "example.jpg"
+            }]
+        }},
+        {result: {
+            images: [{
+                original: "{% static 'img/beautyisdataful/examples/15_1.jpg' %}",
+                improved: "{% static 'img/beautyisdataful/examples/15_2.jpg' %}",
+                rating: 6.99,
+                name: "example.jpg"
+            }]
+        }},
+        {result: {
+            images: [{
+                original: "{% static 'img/beautyisdataful/examples/24_1.jpg' %}",
+                improved: "{% static 'img/beautyisdataful/examples/24_2.jpg' %}",
+                rating: 7.10,
+                name: "example.jpg"
+            }]
+        }},
+        {result: {
+            images: [{
+                original: "{% static 'img/beautyisdataful/examples/9_1.jpg' %}",
+                improved: "{% static 'img/beautyisdataful/examples/9_2.jpg' %}",
+                rating: 6.89,
+                name: "example.jpg"
+            }]
+        }},
+        {result: {
+            images: [{
+                original: "{% static 'img/beautyisdataful/examples/34_1.jpg' %}",
+                improved: "{% static 'img/beautyisdataful/examples/34_2.jpg' %}",
+                rating: 7.11,
+                name: "example.jpg"
+            }]
+        }},
+        {result: {
+            images: [{
+                original: "{% static 'img/beautyisdataful/examples/33_1.jpg' %}",
+                improved: "{% static 'img/beautyisdataful/examples/33_2.jpg' %}",
+                rating: 7.07,
+                name: "example.jpg"
             }]
         }},
     ];
@@ -96,20 +163,20 @@
                 image.src = data.result.images[i].improved;
                 $(image).attr("improved", data.result.images[i].improved);
                 $(image).attr("orig", resizedImages[i].dataUrl);
-                $(image).addClass("hoverImgToOrig col-xs-12 col-sm-6");
+                $(image).addClass("imgproved hoverImgToOrig col-xs-12");
                 $(image).css("padding",1);
 
                 $('#improvedImages').append(image);
 
-                image = new Image();
-                image.src = data.result.images[i].improvedF;
-                $(image).attr("improved", data.result.images[i].improvedF);
-                $(image).attr("orig", resizedImages[i].dataUrl);
-                $(image).attr("toggleOrig", false);
-                $(image).addClass("hoverImgToOrig col-xs-12 col-sm-6");
-                $(image).css("padding",1);
-
-                $('#improvedImages').append(image);
+{#                image = new Image();#}
+{#                image.src = data.result.images[i].improvedF;#}
+{#                $(image).attr("improved", data.result.images[i].improvedF);#}
+{#                $(image).attr("orig", resizedImages[i].dataUrl);#}
+{#                $(image).attr("toggleOrig", false);#}
+{#                $(image).addClass("hoverImgToOrig col-xs-12 col-sm-6");#}
+{#                $(image).css("padding",1);#}
+{##}
+{#                $('#improvedImages').append(image);#}
             }
 
             //set the rating
