@@ -167,16 +167,6 @@
                 $(image).css("padding",1);
 
                 $('#improvedImages').append(image);
-
-{#                image = new Image();#}
-{#                image.src = data.result.images[i].improvedF;#}
-{#                $(image).attr("improved", data.result.images[i].improvedF);#}
-{#                $(image).attr("orig", resizedImages[i].dataUrl);#}
-{#                $(image).attr("toggleOrig", false);#}
-{#                $(image).addClass("hoverImgToOrig col-xs-12 col-sm-6");#}
-{#                $(image).css("padding",1);#}
-{##}
-{#                $('#improvedImages').append(image);#}
             }
 
             //set the rating
@@ -397,7 +387,7 @@
     <h1 class="title">Objctify Me</h1>
 </div>
 <div class="row center-text">
-    <h4>Our Artificial Intelligence algorithms rate your attractiveness and then tweak the photo to make it better!*</h4>
+    <h4>Our Artificial Intelligence algorithm rates your attractiveness and then tweak the photo to make it better!*</h4>
 </div>
 
 <div class="row" style="margin-top: 30px;">
@@ -428,12 +418,12 @@
 
 <div class="row">
     <label class="btn btn-info btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-0 col-md-offset-2 textwrap">
-        Upload Your Own (Female)
+        Upload Your<br>Own (Female)
         <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
         <input id="imageselect_F" class="btn" type="file" accept="image/*" multiple style="display: none;">
     </label>
     <label class="btn btn-primary btn-file col-xs-6 col-sm-4 col-md-4 col-sm-offset-2 col-md-offset-1 textwrap">
-        Upload Your Own (Male)
+        Upload Your<br>Own (Male)
         <span class="glyphicon glyphicon-camera" aria-hidden="true" style="margin-left: 6px;"></span>
         <input id="imageselect_M" class="btn" type="file" accept="image/*" multiple style="display: none;">
     </label>
@@ -444,9 +434,9 @@
 </div>
 
 <div class="row" style="margin-top:40px;">
-    <p>*Disclaimer: Objctify.Me is trained on data gathered from reddits r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results too seriously.
+    <p>*Disclaimer: Objctify.Me is trained on data gathered from Reddit's /r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results too seriously.
         <br>
-    Uploaded data may be stored in order to improve the algorithm, but will not be shared with others.</p>
+    Uploaded data may be stored for caching, but will not be shared with others.</p>
 </div>
 {% endblock %}
 
@@ -485,11 +475,11 @@
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-2">
-                        <p>Our algorithms rate you:</p>
+                        <p>Our algorithm rates you:</p>
                         <span class="glyphicon glyphicon-arrow-left hidden-xs-down" aria-hidden="true"></span>
                         <span id="rating" style="font-size: 50px; font-weight: bold;">1</span>
 
-                        <p>Here are our tweaked images.<br>(tap or ctrl+hover over them to see the original)</p>
+                        <p>Here's our tweaked images.<br>(tap or ctrl+hover over them to see the original)</p>
                         <span class="glyphicon glyphicon-arrow-right hidden-xs-down" aria-hidden="true"></span>
                     </div>
                     <div class="col-xs-12 col-sm-7">
