@@ -28,6 +28,8 @@ def index(request):
     return render_to_response('objctify/index.html')
 def about(request):
     return render_to_response('objctify/about.html')
+def author(request):
+    return render_to_response('objctify/author.html')
 
 def averageFaces(request):
     return render_to_response('objctify/3D/averageFaces.html')

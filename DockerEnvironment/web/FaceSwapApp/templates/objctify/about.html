@@ -6,13 +6,17 @@
     <script type="text/javascript" src="{% static 'js/carousel.js' %}"></script>
     <style>
         #message {
-            position: absolute;
+            position: fixed;
             top: 64px;
+            width:70px;
+            height:50px;
+            border-bottom-left-radius: 50px;
             right: 0;
             cursor: pointer;
-        }
-        #inner-message {
-            margin: 0 auto;
+            z-index:9999;
+            text-align:right;
+            padding:0;
+            padding-right:10px;
         }
     </style>
     <script>
@@ -42,15 +46,13 @@
 {% endblock %}
 
 {% block content_block %}
-{#    <div class="row">#}
-{#    <a href="https://crowdrobotics.org/">#}
-{#    <div id="message" class="col-xs-12 col-sm-4">#}
-{#        <div class="alert alert-warning">#}
-{#            <b>Heads up!</b> I'm currently looking for a job. If you like this work, check out my CV and some of my other projects.#}
-{#        </div>#}
-{#    </div>#}
-{#    </a>#}
-{#    </div>#}
+    <div class="row">
+    <a href="{% url 'author' %}">
+        <div  id="message" class="alert alert-warning">
+            Hire<br>Me
+        </div>
+    </a>
+    </div>
     <div class="row center-text">
         <h1 class="title">Beauty Is Dataful</h1>
     </div>

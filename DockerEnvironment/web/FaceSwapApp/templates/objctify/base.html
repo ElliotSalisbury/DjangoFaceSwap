@@ -13,8 +13,8 @@
 
     {% block head_block %}{% endblock %}
 </head>
-<body>
-	<div class="navbar navbar-default" role="navigation">
+<body style="padding-top:70px;">
+	<div class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -32,11 +32,11 @@
                             How it works
                         </a>
 					</li>
-{#                    <li id="-projects">#}
-{#						<a href="{% url 'crowdrobotics:projects' %}">#}
-{#                            Projects#}
-{#                        </a>#}
-{#					</li>#}
+                    <li id="-author">
+						<a href="{% url 'author' %}">
+                            About the Author (Hire me)
+                        </a>
+					</li>
 {#                    <li id="-publications">#}
 {#						<a href="{% url 'crowdrobotics:publications' %}">#}
 {#                            Publications#}

@@ -4,6 +4,7 @@ from FaceSwapApp import views
 
 urlpatterns = [url(r'^$', views.index, name='home'),
                url(r'^about$', views.about, name='about'),
+               url(r'^author$', views.author, name='author'),
                url(r'^uploadImage$', views.upload, name='upload'),
 
                url(r'^3D/AverageFaces$', views.averageFaces, name='averageFaces'),

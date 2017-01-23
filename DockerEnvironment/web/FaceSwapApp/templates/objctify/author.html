@@ -1,0 +1,86 @@
+{% extends 'objctify/base.html' %}
+{% load staticfiles %}
+
+
+{% block head_block %}
+    <script>
+    function changeSrc(target, num) {
+        var currSrc = $(target).attr("src");
+        currSrc = currSrc.split("_")[0];
+        currSrc = currSrc + "_" + num + ".jpg";
+        $(target).attr("src", currSrc)
+    }
+    $(function() {
+        $("#meimg").hover(function(event){
+            changeSrc(event.target, "orig");
+        }, function(event) {
+            changeSrc(event.target, "better");
+        });
+        $("#meimg").click(function(event){
+            if ($(event.target).attr("toggleOrig") === "true") {
+                $(event.target).attr("toggleOrig", false);
+                changeSrc(event.target, "orig");
+            }else {
+                $(event.target).attr("toggleOrig", true);
+                changeSrc(event.target, "better");
+            }
+        });
+    });
+    </script>
+{% endblock %}
+
+{% block content_block %}
+<div class="row center-text">
+    <h1 class="title">About Me</h1>
+</div>
+<div class="row center-text" style="padding-bottom:20px;">
+    <h4>A PhD student interested in computer vision and machine learning</h4>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 col-sm-4">
+        <img id="meimg" src="{% static 'img/author/me2_better.jpg' %}" class="img-responsive">
+    </div>
+    <div class="col-xs-12 col-sm-8">
+        <p>
+            I am a PhD student at the University of Southampton.<br>
+            I am interested in developing exciting new applications with computer vision.<br>
+            My research has been focused on developing human-intelligent sensor by combining computer vision, AI, and real-time crowdsourcing.
+            This sensor can locate and track, in real-time, any object described by natural language.
+            For example, this can then be used to inform a robot where or what an object is, and enable them to autonomously carry out natural language instructions.<br>
+            <a href="https://crowdrobotics.org/projects/crowdar">Checkout my CrowdAR project here</a>
+        </p>
+        <p>
+            I'll be graduating soon, and I'm currently looking for jobs, <a href="https://crowdrobotics.org/projects/crowdar">Checkout my CV</a>
+        </p>
+    </div>
+</div>
+
+<div class="row center-text">
+    <h4>Other Projects</h4>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <p>
+            <a href="https://crowdrobotics.org/projects/crowdar">
+                CrowdAR: <span style="color:rgb(102, 102, 102);">A human-intelligent sensor feed, combining computer vision, AI, and real-time crowdsourcing.</span>
+            </a>
+        </p>
+    </div>
+    <div class="col-xs-12">
+        <p>
+            <a href="https://chrome.google.com/webstore/detail/trump-face-swap/dildjblgglmoojcjbiolhopleloboikd">
+                Trump Face Swap: <span style="color:rgb(102, 102, 102);">A chrome browser extension that faceswaps all the images on the page with donald trump.</span>
+            </a>
+        </p>
+    </div>
+    <div class="col-xs-12">
+        <p>
+            <a href="https://github.com/ElliotSalisbury/CrowdDrone">
+                CrowdDrone: <span style="color:rgb(102, 102, 102);">A crowd controllable Parrot ARDrone, streams live video to an online crowd, and they use their arrow keys to control where it flys.</span>
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}
