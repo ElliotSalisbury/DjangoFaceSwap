@@ -26,4 +26,4 @@ def beautifyIm_Web(im, gender):
     rating = rateFace(im, pca, gp)
     # image = beautifyIm(im, pca, gp, trainX, trainY, method='KNN')
     image = beautifyIm3D(im, pca3D, gp3D, trainX3D, trainY3D, method='GP')
-    return rating, image, None
+    return rating, image
