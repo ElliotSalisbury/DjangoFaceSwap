@@ -65,9 +65,15 @@
 
                 I want to find out what intrinsic characteristics make a person more or less attractive.
                 With that knowledge, we could rank a user's photos helping them choose which photos to use on social media (Facebook, Tinder, etc.),
-                or create instagram or snapchat like filters that would edit the photo to appear more attractive.
+                or create instagram or snapchat like filters that would edit the photo to make the subject appear more attractive.
             </p>
-
+        </div>
+    </div>
+    <div class="row">
+        <h4>Analysing /r/RateMe:</h4>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
             <p>
                 To start I'll need a large dataset containing imagery of people who have been ranked in attractiveness.
                 I chose <a href="http://www.reddit.com/r/RateMe">/r/RateMe</a>, a subreddit where users can submit pictures of themselves and commenters will provide constructive criticism
@@ -142,6 +148,9 @@
         </div>
     </div>
     <div class="row">
+        <h4>Training a computer to understand beauty:</h4>
+    </div>
+    <div class="row">
         <div class="col-sm-4">
             <figure>
                 <img src="{% static 'img/beautyisdataful/Landmarks.jpg' %}" class="img-responsive">
@@ -197,7 +206,7 @@
             </p>
             <p>
                 We could use this approach to create a "2D beautifier", that would subtly morph people's faces towards the more attractive features.
-                However, this approach has some downsides, it may work well for frontal faces, but once the face turns away from the camera, we start to distort the face in ways that appear unnatural (See the <a href="{% url 'home' %}">interactive demo</a> for examples of this).
+                However, this approach has some downsides, it may work well for frontal faces, but once the face turns away from the camera, we start to distort the face in ways that appear unnatural.
                 We'll need to understand how the face is oriented in 3D space in order to solve this problem.
                 The next step was to use a <a href="https://github.com/patrikhuber/eos">3D face mesh fitting library</a>.
                 The 3D face fitting (Right) uses a 3D model of the average human face, and works by changing the orientation and the features (e.g, brow shape, chin width, eye location) until it aligns closely with the image and the detected landmarks.
@@ -212,6 +221,9 @@
         </div>
     </div>
 
+    <div class="row">
+        <h4>Beauty in the third dimension:</h4>
+    </div>
 
     <div class="row">
         <div class="col-xs-12">
