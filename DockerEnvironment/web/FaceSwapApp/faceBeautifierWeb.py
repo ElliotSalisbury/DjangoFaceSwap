@@ -2,6 +2,7 @@ from US10k.US10k import loadUS10k
 from RateMe.RateMe import loadRateMe
 from Beautifier.beautifier import beautifyIm, rateFace
 from Beautifier.face3D.beautifier3D import beautifyIm3D, rateFace3D
+from Beautifier.faceCNN.beautifierCNN import getWebResults
 
 # US10k_2D_F = loadUS10k(type="2d", gender="F")
 # US10k_2D_M = loadUS10k(type="2d", gender="M")
@@ -15,6 +16,9 @@ RateMe_2D_M = loadRateMe(type="2d", gender="M", server=True)
 RateMe_3D_F = loadRateMe(type="3d", gender="F", server=True)
 RateMe_3D_M = loadRateMe(type="3d", gender="M", server=True)
 
+*_, predictor_CNN_F = loadRateMe(type="cnn", gender="F", server=True)
+*_, predictor_CNN_M = loadRateMe(type="cnn", gender="M", server=True)
+
 def beautifyIm_Web(im, gender):
     if gender == "F":
         trainX, trainY, pca, gp = RateMe_2D_F
@@ -27,3 +31,11 @@ def beautifyIm_Web(im, gender):
     # image = beautifyIm(im, pca, gp, trainX, trainY, method='KNN')
     image = beautifyIm3D(im, pca3D, gp3D, trainX3D, trainY3D, method='GP')
     return rating, image
+
+def beautifyIm_Web_CNN(im, gender):
+    if gender == "F":
+        predictor = predictor_CNN_F
+    elif gender == "M":
+        predictor = predictor_CNN_M
+
+    return getWebResults(im, predictor)

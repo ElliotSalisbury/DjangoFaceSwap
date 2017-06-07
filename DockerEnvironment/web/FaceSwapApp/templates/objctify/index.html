@@ -148,6 +148,15 @@
             allRatings = [];
 //        data.result.images.sort(function(a, b){return b.rating-a.rating});
             for (var i=0; i<data.result.images.length; i++) {
+                var imageData = data.result.images[i].results;
+
+                var modelview = imageData.modelview;
+                var projection = imageData.projection;
+                var viewport = imageData.viewport;
+                var indexs = imageData.indexs;
+                var facefeatures = imageData.facefeatures;
+                var new_facefeatures = imageData.new_facefeatures;
+
                 //create original image
                 var orig = $("<img>");
                 orig.attr("src", resizedImages[i].dataUrl);
@@ -155,7 +164,7 @@
                 orig.appendTo('#originalImages');
 
                 //add the ratings to the array
-                allRatings.push(data.result.images[i].rating);
+                allRatings.push(imageData.rating);
 
                 //create the improved image, and convert to jpg for saving
                 //create a download link
@@ -387,7 +396,7 @@
     <h1 class="title">Objctify Me</h1>
 </div>
 <div class="row center-text">
-    <h4>Our Artificial Intelligence algorithm rates your attractiveness and then tweak the photo to make it better!*</h4>
+    <h4>Use Neural Networks to rate your attractiveness and then tweak the photo to make it better!*</h4>
 </div>
 
 <div class="row" style="margin-top: 30px;">
@@ -434,7 +443,7 @@
 </div>
 
 <div class="row" style="margin-top:40px;">
-    <p>*Disclaimer: Objctify.Me is trained on data gathered from Reddit's /r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results too seriously.
+    <p>*Disclaimer: Objctify.Me is trained on data gathered from Reddit's /r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results seriously.
         <br>
     Uploaded data may be stored for caching, but will not be shared with others.</p>
 </div>
