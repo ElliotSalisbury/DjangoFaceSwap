@@ -178,7 +178,7 @@
                 From these points we calculate a set of features that we might be interested in, e.g., distances from the eyes, the nose, etc.
             </p>
             <p>
-                With this data we can train a machine learning algorithm to identify the face shape that reddit deems most attractive.
+                With this data we can train a machine learning algorithm, a support vector regression, to identify the face shape that reddit deems most attractive.
                 We can use this algorithm to predict the attractiveness score of a given face shape.
                 Furthermore, since we can give a score to a face shape, then we can keep modifying this shape until we get a higher score.
                 Once we've modified the face, maximised the score, we can rerender the original image with the new modified facial features.
@@ -218,11 +218,10 @@
                 While for men the shape of the chin and face length is more important.
             </p>
             <p>
-                We could use this approach to create a "2D beautifier" filter, that would subtly morph people's faces towards the more attractive features.
+                We could use this approach to create a "2D beautifier" filter, that would subtly morph people's faces towards the more attractive features, and this is the approach taken by <a href="http://leyvand.com/beautification2008/">Leyvand's SIGGRAPH'08 paper</a>.
                 However, this approach has some downsides, it may work well for frontal faces, but once the face turns away from the camera, we start to distort the face in ways that appear unnatural.
+                The warping doesnt take into account the perspective change and the 3D structure of the face.
                 We'll need to understand how the face is oriented in 3D space in order to solve this problem.
-                The next step was to use a <a href="https://github.com/patrikhuber/eos">3D face fitting library</a>.
-                The 3D face fitting (Right) uses a model of the average human face, and works by changing the position, rotation, and the features (e.g, brow shape, chin width, eye location) until it aligns closely with the image and the detected landmarks.
             </p>
         </div>
         <div class="col-sm-4">
@@ -249,9 +248,13 @@
     <div class="row">
         <div class="col-sm-8">
             <p>
-                We calculate the 3D face fitting for all the faces in our dataset.
+                We need to be able to calculate the 3D face shape of a person given a single 2D image of them.
+                There are a number of ways to do this, but I used a combination of a <a href="https://github.com/patrikhuber/eos">3D face fitting library</a> and a <a href="http://www.openu.ac.il/home/hassner/projects/CNN3DMM/">CNN trained to output accurate 3D face shapes.</a>
+                The CNN uses holistic features in the image to estimate a 3D face model, while the face fitting library uses that 3D model, changing the position, and rotation, until it aligns closely with the image and the detected landmarks.
+
+                We calculate the 3D face shape for all the faces in our RateMe dataset.
                 From this we create 5 average faces from the from the lowest to the most attractive quintiles.
-                Click on the image above to explore these faces in 3D (you'll need a WebGL compatible browser), drag the left click to rotate, right click to rotate, and scroll to zoom.
+                Click on the image above to explore these faces in 3D (you'll need a WebGL compatible browser), drag the left click to rotate, right click to move, and scroll to zoom.
                 On the right we show an animation morphing between these faces.
             </p>
 
@@ -263,8 +266,8 @@
             <p>
                 The face images below are sourced from the US10k dataset, a dataset of many faces that, amongst other things, have been rated in their attractiveness.
                 I performed similar experiments using this data and got basically the same results.
-                I decided to talk about the reddit dataset here as it is larger, has many more ratings, and is just generally more interesting.
-                However, I didn't want to recognisably use redditors' faces without their permission, so I'm using the US10ks publication friendly faces to demonstrate the techniques used.
+                I decided to talk about the reddit dataset here as it is larger, has many more ratings, and is generally more interesting.
+                However, I didn't want to recognisably use redditors' faces without their permission, so I'm using the US10Ks publication friendly faces to demonstrate the techniques used.
             </p>
             <p>
                 Bainbridge, W.A., Isola, P., & Oliva, A. (2013). The intrinsic memorability of face images. <i>Journal of Experimental Psychology: General. Journal of Experimental Psychology: General</i>, 142(4), 1323-1334.
@@ -318,9 +321,9 @@
             </p>
         </div>
     </div>
-    <div class="row">
-        <div class="col-xs-12">
-            <img src="{% static 'img/beautyisdataful/allfaces.jpg' %}" class="img-responsive">
-        </div>
-    </div>
+{#    <div class="row">#}
+{#        <div class="col-xs-12">#}
+{#            <img src="{% static 'img/beautyisdataful/allfaces.jpg' %}" class="img-responsive">#}
+{#        </div>#}
+{#    </div>#}
 {% endblock %}

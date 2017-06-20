@@ -418,11 +418,11 @@
     <h1 class="title">Objctify Me</h1>
 </div>
 <div class="row center-text">
-    <h4>Use Neural Networks to rate your attractiveness and then tweak the photo to make it better!*</h4>
+    <h4>Use Deep Learning to rate your attractiveness and then tweak the photo to make it better!*</h4>
 </div>
 
 <div class="row" style="margin-top: 30px;">
-    <p>Try it out on our example set or upload your own below:</p>
+    <p>Try it out on our example set below or upload your own:</p>
     <div id="example_carousel">
         <ul>
         </ul>
@@ -467,7 +467,7 @@
 <div class="row" style="margin-top:40px;">
     <p>*Disclaimer: Objctify.Me is trained on data gathered from Reddit's /r/RateMe (see <a href="{% url 'about' %}">How it works</a>), and probably suffers from huge cultural bias. Don't take the results seriously.
         <br>
-    Uploaded data may be stored for caching, but will not be shared with others.</p>
+    Uploaded data may be stored for caching and processing, but will never be shared with others.</p>
 </div>
 {% endblock %}
 
@@ -501,56 +501,49 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-sm-3 hidden-xs-down">
-                        <div id="originalImages" class="scrolls-y">
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-2">
+                    <div class="col-xs-12">
                         <p>Our algorithm rates you:</p>
-                        <span class="glyphicon glyphicon-arrow-left hidden-xs-down" aria-hidden="true"></span>
                         <span id="rating" style="font-size: 50px; font-weight: bold;">1</span>
 
-                        <p>Here's our tweaked images.<br>(tap or ctrl+hover over them to see the original)</p>
-                        <span class="glyphicon glyphicon-arrow-right hidden-xs-down" aria-hidden="true"></span>
+                        <p>Below you can see the 3D reconstruction of your face, and our suggested tweaks.<br>(use the sliders to change the image)</p>
                     </div>
-                    <div class="col-xs-12 col-sm-7">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <canvas id="warpCanvas" class="img-responsive"></canvas>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group form-group-lg">
-                                    <label class="control-label" for="coeffGender">Gender:</label>
-                                    <input type="range" id="coeffGender" value="0" min="-5" max="5" step="0.1">
-                                </div>
-
-                                <div class="form-group form-group-lg">
-                                    <label class="control-label" for="coeffAge">Age:</label>
-                                    <input type="range" id="coeffAge" value="0" min="-5" max="5" step="0.1">
-                                </div>
-
-                                <div class="form-group form-group-lg">
-                                    <label class="control-label" for="coeffWeight">Weight:</label>
-                                    <input type="range" id="coeffWeight" value="0" min="-5" max="5" step="0.1">
-                                </div>
-
-                                <div class="form-group form-group-lg">
-                                    <label class="control-label" for="coeffHeight">Height:</label>
-                                    <input type="range" id="coeffHeight" value="0" min="-5" max="5" step="0.1">
-                                </div>
-
-                                <button id="default">Reset To Default</button>
-                                <div class="form-group form-group-lg">
-                                    <label class="control-label" for="showlandmarks">Show Landmarks:</label>
-                                    <input type="checkbox" id="showlandmarks">
-                                </div>
-                                <div class="form-group form-group-lg">
-                                    <label class="control-label" for="showgrid">Show Grid:</label>
-                                    <input type="checkbox" id="showgrid">
-                                </div>
-                                <div id="3dcanvas" style="width:500px; height:500px"></div>
-                            </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <canvas id="warpCanvas" class="img-responsive"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group form-group-lg">
+                            <label class="control-label" for="coeffGender">Gender:</label>
+                            <input type="range" id="coeffGender" value="0" min="-5" max="5" step="0.1">
                         </div>
+
+                        <div class="form-group form-group-lg">
+                            <label class="control-label" for="coeffAge">Age:</label>
+                            <input type="range" id="coeffAge" value="0" min="-5" max="5" step="0.1">
+                        </div>
+
+                        <div class="form-group form-group-lg">
+                            <label class="control-label" for="coeffWeight">Weight:</label>
+                            <input type="range" id="coeffWeight" value="0" min="-5" max="5" step="0.1">
+                        </div>
+
+                        <div class="form-group form-group-lg">
+                            <label class="control-label" for="coeffHeight">Height:</label>
+                            <input type="range" id="coeffHeight" value="0" min="-5" max="5" step="0.1">
+                        </div>
+
+                        <button id="default">Reset to original</button>
+                        <button id="suggested">Use suggested settings</button>
+                        <div class="form-group form-group-lg">
+                            <label class="control-label" for="showlandmarks">Show Landmarks:</label>
+                            <input type="checkbox" id="showlandmarks">
+                        </div>
+                        <div class="form-group form-group-lg">
+                            <label class="control-label" for="showgrid">Show Grid:</label>
+                            <input type="checkbox" id="showgrid">
+                        </div>
+                        <div id="3dcanvas" style="width:500px; height:500px"></div>
                     </div>
                 </div>
             </div>
