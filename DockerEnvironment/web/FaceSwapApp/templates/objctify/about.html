@@ -248,12 +248,11 @@
     <div class="row">
         <div class="col-sm-8">
             <p>
-                We need to be able to calculate the 3D face shape of a person given a single 2D image of them.
+                We need to be able to calculate the 3D face shape of a person even though we are only given a single 2D image of them.
                 There are a number of ways to do this, but I used a combination of a <a href="https://github.com/patrikhuber/eos">3D face fitting library</a> and a <a href="http://www.openu.ac.il/home/hassner/projects/CNN3DMM/">CNN trained to output accurate 3D face shapes.</a>
                 The CNN uses holistic features in the image to estimate a 3D face model, while the face fitting library uses that 3D model, changing the position, and rotation, until it aligns closely with the image and the detected landmarks.
 
-                We calculate the 3D face shape for all the faces in our RateMe dataset.
-                From this we create 5 average faces from the from the lowest to the most attractive quintiles.
+                We calculate the 3D face shape for all the faces in our RateMe dataset, and from this we create 5 average faces from the from the lowest to the most attractive quintiles.
                 Click on the image above to explore these faces in 3D (you'll need a WebGL compatible browser), drag the left click to rotate, right click to move, and scroll to zoom.
                 On the right we show an animation morphing between these faces.
             </p>
