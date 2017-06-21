@@ -1,6 +1,6 @@
 web:
   restart: always
-  build: ./web
+  image: elliotsalisbury/objctify_web:latest
   expose:
     - "8000"
   links:
@@ -14,7 +14,7 @@ web:
 
 celeryworker:
   restart: always
-  build: ./web
+  image: elliotsalisbury/objctify_web:latest
   links:
     - postgres:postgres
     - redis:redis
