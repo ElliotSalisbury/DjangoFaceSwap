@@ -39,3 +39,19 @@ def beautifyIm_Web_CNN(im, gender):
         predictor = predictor_CNN_M
 
     return getWebResults(im, predictor)
+
+if __name__ == "__main__":
+    import cv2
+    import json
+    imageIs = [0,1,7,8,22,15,24,9,34,33]
+    for index, im_i in enumerate(imageIs):
+        gender = "F"
+        if index %2 == 0:
+            gender = "M"
+
+        filepath = "C:\\Users\\ellio\\PycharmProjects\\FaceSwap\\DockerEnvironment\\web\\static\\img\\beautyisdataful\\examples\\{}_1.jpg".format(im_i)
+        im = cv2.imread(filepath)
+        results = beautifyIm_Web_CNN(im, gender)
+
+        output = "\t\t{result: {\n\t\t\timages: [{\n\t\t\t\toriginal: \"{% static 'img/beautyisdataful/examples/"+str(im_i)+"_1.jpg' %}\",\n\t\t\t\tresults: "+json.dumps(results)+"\n\t\t\t}]\n\t\t}},"
+        print(output)
